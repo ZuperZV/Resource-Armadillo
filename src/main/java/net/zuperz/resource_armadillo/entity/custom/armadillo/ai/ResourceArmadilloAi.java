@@ -36,10 +36,11 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.entity.ai.sensing.SensorType;
+import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.item.ItemStack;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
-import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceSensorType;
+import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceSensorTypes;
 
 public class ResourceArmadilloAi {
     private static final float SPEED_MULTIPLIER_WHEN_PANICKING = 2.0F;
@@ -50,9 +51,15 @@ public class ResourceArmadilloAi {
     private static final double DEFAULT_CLOSE_ENOUGH_DIST = 2.0;
     private static final double BABY_CLOSE_ENOUGH_DIST = 1.0;
     private static final UniformInt ADULT_FOLLOW_RANGE = UniformInt.of(5, 16);
+
     private static final ImmutableList<SensorType<? extends Sensor<? super ResourceArmadilloEntity>>> SENSOR_TYPES = ImmutableList.of(
-            SensorType.NEAREST_LIVING_ENTITIES, SensorType.HURT_BY, ResourceSensorType.ARMADILLO_TEMPTATIONS, SensorType.NEAREST_ADULT, ResourceSensorType.ARMADILLO_SCARE_DETECTED
+            SensorType.NEAREST_LIVING_ENTITIES,
+            SensorType.HURT_BY,
+            (SensorType<? extends Sensor<? super ResourceArmadilloEntity>>) ResourceSensorTypes.ARMADILLO_TEMPTATIONS.get(),
+            SensorType.NEAREST_ADULT,
+            (SensorType<? extends Sensor<? super ResourceArmadilloEntity>>) ResourceSensorTypes.ARMADILLO_SCARE_DETECTED.get()
     );
+
     private static final ImmutableList<MemoryModuleType<?>> MEMORY_TYPES = ImmutableList.of(
             MemoryModuleType.IS_PANICKING,
             MemoryModuleType.HURT_BY,

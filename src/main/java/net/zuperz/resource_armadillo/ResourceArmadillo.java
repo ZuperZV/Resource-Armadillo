@@ -17,6 +17,7 @@ import net.zuperz.resource_armadillo.entity.custom.armadillo.client.ModModelLaye
 import net.zuperz.resource_armadillo.entity.custom.armadillo.client.ResourceArmadilloModel;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.client.ResourceArmadilloRenderer;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceEntityDataSerializers;
+import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceSensorTypes;
 import net.zuperz.resource_armadillo.item.ModItems;
 import org.slf4j.Logger;
 
@@ -54,6 +55,7 @@ public class ResourceArmadillo
         ModEntities.register(modEventBus);
 
         ResourceEntityDataSerializers.register(modEventBus);
+        ResourceSensorTypes.register(modEventBus);
 
 
         NeoForge.EVENT_BUS.register(this);

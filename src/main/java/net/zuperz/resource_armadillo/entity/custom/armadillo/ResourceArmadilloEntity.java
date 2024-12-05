@@ -55,7 +55,7 @@ public class ResourceArmadilloEntity extends Animal {
     public static final int SCARE_CHECK_INTERVAL = 80;
     private static final double SCARE_DISTANCE_HORIZONTAL = 7.0;
     private static final double SCARE_DISTANCE_VERTICAL = 2.0;
-    private static final EntityDataAccessor<ResourceArmadilloEntity.ArmadilloState> ARMADILLO_STATE = SynchedEntityData.defineId(
+    private static final EntityDataAccessor<ArmadilloState> ARMADILLO_STATE = SynchedEntityData.defineId(
             ResourceArmadilloEntity.class, ResourceEntityDataSerializers.RESOURCE_ARMADILLO_STATE
     );
 

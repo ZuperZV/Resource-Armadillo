@@ -8,6 +8,8 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
 
+import static net.minecraft.network.syncher.EntityDataSerializers.registerSerializer;
+
 public class ResourceEntityDataSerializers {
 
     public static final DeferredRegister<EntityDataSerializer<?>> ENTITY_DATA_SERIALIZERS = DeferredRegister.create(
@@ -22,5 +24,9 @@ public class ResourceEntityDataSerializers {
 
     public static void register(IEventBus eventBus) {
         ENTITY_DATA_SERIALIZERS.register(eventBus);
+    }
+
+    static {
+        ENTITY_DATA_SERIALIZERS.register("armadillo_state", () -> RESOURCE_ARMADILLO_STATE);
     }
 }

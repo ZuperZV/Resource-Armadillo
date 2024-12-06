@@ -2,9 +2,15 @@ package net.zuperz.resource_armadillo.entity.custom.armadillo;
 
 import com.mojang.serialization.Dynamic;
 import io.netty.buffer.ByteBuf;
+
+import java.awt.*;
+import java.util.TimerTask;
 import java.util.function.IntFunction;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -12,6 +18,7 @@ import net.minecraft.network.protocol.game.DebugPackets;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -38,8 +45,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -55,6 +62,11 @@ public class ResourceArmadilloEntity extends Animal {
     public static final int SCARE_CHECK_INTERVAL = 80;
     private static final double SCARE_DISTANCE_HORIZONTAL = 7.0;
     private static final double SCARE_DISTANCE_VERTICAL = 2.0;
+
+    private double productionSpeed = 1.0;
+    private ItemStack resourceQuality = Items.ARMADILLO_SCUTE.getDefaultInstance();
+    private double efficiency = 1.0;
+
     private static final EntityDataAccessor<ArmadilloState> ARMADILLO_STATE = SynchedEntityData.defineId(
             ResourceArmadilloEntity.class, ResourceEntityDataSerializers.RESOURCE_ARMADILLO_STATE
     );
@@ -63,6 +75,7 @@ public class ResourceArmadilloEntity extends Animal {
     public final AnimationState rollOutAnimationState = new AnimationState();
     public final AnimationState rollUpAnimationState = new AnimationState();
     public final AnimationState peekAnimationState = new AnimationState();
+    private int scuteCount;
     private int scuteTime;
     private boolean peekReceivedClient = false;
 
@@ -70,7 +83,20 @@ public class ResourceArmadilloEntity extends Animal {
         super(pEntityType, pLevel);
         this.getNavigation().setCanFloat(true);
         this.scuteTime = this.pickNextScuteDropTime();
+        this.scuteCount = this.pickNextScuteCount();
     }
+
+    /* Resource - stats */
+
+    public ItemStack getResourceQuality() {
+        return this.resourceQuality;
+    }
+
+    public void setResourceQuality(ItemStack resourceQuality) {
+        this.resourceQuality = resourceQuality;
+    }
+
+    /* Armadillo */
 
     @Nullable
     @Override
@@ -141,18 +167,30 @@ public class ResourceArmadilloEntity extends Animal {
         this.level().getProfiler().push("armadilloActivityUpdate");
         ResourceArmadilloAi.updateActivity(this);
         this.level().getProfiler().pop();
+
         if (this.isAlive() && !this.isBaby() && --this.scuteTime <= 0) {
-            this.playSound(SoundEvents.ARMADILLO_SCUTE_DROP, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
-            this.spawnAtLocation(Items.ARMADILLO_SCUTE);
-            this.gameEvent(GameEvent.ENTITY_PLACE);
+            if (this.scuteCount > 0) {
+                this.playSound(SoundEvents.ARMADILLO_SCUTE_DROP, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
+                this.spawnAtLocation(getResourceQuality());
+                this.gameEvent(GameEvent.ENTITY_PLACE);
+                this.scuteCount--;
+                this.scheduleScuteReset();
+            }
             this.scuteTime = this.pickNextScuteDropTime();
         }
 
         super.customServerAiStep();
     }
+    private void scheduleScuteReset() {
+        ResourceArmadilloEntity.this.scuteCount = 0;
+    }
 
     private int pickNextScuteDropTime() {
         return this.random.nextInt(20 * TimeUtil.SECONDS_PER_MINUTE * 5) + 20 * TimeUtil.SECONDS_PER_MINUTE * 5;
+    }
+
+    private int pickNextScuteCount() {
+        return this.random.nextInt(1, 3);
     }
 
     @Override
@@ -251,11 +289,10 @@ public class ResourceArmadilloEntity extends Animal {
         super.addAdditionalSaveData(pCompound);
         pCompound.putString("state", this.getState().getSerializedName());
         pCompound.putInt("scute_time", this.scuteTime);
+        pCompound.putInt("scute_count", this.scuteCount);
+
     }
 
-    /**
-     * (abstract) Protected helper method to read subclass entity data from NBT.
-     */
     @Override
     public void readAdditionalSaveData(CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
@@ -263,7 +300,12 @@ public class ResourceArmadilloEntity extends Animal {
         if (pCompound.contains("scute_time")) {
             this.scuteTime = pCompound.getInt("scute_time");
         }
+        if (pCompound.contains("scute_count")) {
+            this.scuteCount = pCompound.getInt("scute_count");
+        }
     }
+
+
 
     public void rollUp() {
         if (!this.isScared()) {
@@ -316,12 +358,18 @@ public class ResourceArmadilloEntity extends Animal {
     @Override
     public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
-        if (itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH) && this.brushOffScute()) {
+        if (itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH) && scuteCount > 0 && this.brushOffScute()) {
             itemstack.hurtAndBreak(16, pPlayer, getSlotForHand(pHand));
+            scuteCount--;
             return InteractionResult.sidedSuccess(this.level().isClientSide);
-        } else {
-            return this.isScared() ? InteractionResult.FAIL : super.mobInteract(pPlayer, pHand);
+        } else if (!itemstack.isEmpty()) {
+            setResourceQuality(itemstack);
+            System.out.println("Item used in setResourceQuality: " + itemstack.getDisplayName().getString());
+            System.out.println("scuteCount: " + scuteCount);
+        } else if (itemstack.isEmpty()) {
+            System.out.println("scuteCount: " + scuteCount);
         }
+        return this.isScared() ? InteractionResult.FAIL : super.mobInteract(pPlayer, pHand);
     }
 
     @Override
@@ -337,7 +385,7 @@ public class ResourceArmadilloEntity extends Animal {
         if (this.isBaby()) {
             return false;
         } else {
-            this.spawnAtLocation(new ItemStack(Items.ARMADILLO_SCUTE));
+            this.spawnAtLocation(new ItemStack(getResourceQuality().getItem()));
             this.gameEvent(GameEvent.ENTITY_INTERACT);
             this.playSound(SoundEvents.ARMADILLO_BRUSH);
             return true;

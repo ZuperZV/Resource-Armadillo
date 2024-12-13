@@ -38,6 +38,7 @@ import javax.annotation.Nullable;
 public class AtomicOvenBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    public static BooleanProperty ARMADILLO_DATA = BooleanProperty.create("armadillo_data");
     static VoxelShape SHAPE = Shapes.or(
             box(0, 0, 0, 16, 9, 16),
 
@@ -82,12 +83,13 @@ public class AtomicOvenBlock extends Block implements EntityBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         return this.defaultBlockState().setValue(FACING, pContext.getHorizontalDirection().getOpposite())
-                .setValue(LIT, false);
+                .setValue(LIT, false)
+                .setValue(ARMADILLO_DATA, false);
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(FACING, LIT);
+        pBuilder.add(FACING, LIT, ARMADILLO_DATA);
     }
 
     @Override
@@ -139,6 +141,7 @@ public class AtomicOvenBlock extends Block implements EntityBlock {
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (state.getBlock() != newState.getBlock()) {
             if (level.getBlockEntity(pos) instanceof AtomicOvenBlockEntity furnace) {
+                furnace.setItem(3, ItemStack.EMPTY);
                 furnace.dropItems();
             }
         }

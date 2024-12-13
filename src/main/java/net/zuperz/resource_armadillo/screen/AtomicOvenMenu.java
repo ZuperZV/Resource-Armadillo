@@ -1,7 +1,6 @@
 package net.zuperz.resource_armadillo.screen;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -12,11 +11,10 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import net.zuperz.resource_armadillo.block.ModBlocks;
 import net.zuperz.resource_armadillo.block.entity.custom.AtomicOvenBlockEntity;
 import net.zuperz.resource_armadillo.screen.slot.ModMenuTypes;
-import org.jetbrains.annotations.Nullable;
 
 public class AtomicOvenMenu extends AbstractContainerMenu {
     private final BlockPos pos;
-    private final AtomicOvenBlockEntity blockentity;
+    public final AtomicOvenBlockEntity blockentity;
     public AtomicOvenMenu(int containerId, Player player, BlockPos pos) {
         super(ModMenuTypes.ATOMIC_OVEN_MENU.get(), containerId);
         AtomicOvenBlockEntity AtomicOvenBlockEntity;
@@ -105,6 +103,10 @@ public class AtomicOvenMenu extends AbstractContainerMenu {
 
     public boolean isCrafting() {
         return blockentity.getProgress() > 0;
+    }
+
+    public ItemStack isSlotItem(int slot) {
+        return blockentity.getSlotInputItems(slot);
     }
 
     public boolean hasArmadillo() {

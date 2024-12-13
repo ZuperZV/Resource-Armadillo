@@ -164,9 +164,9 @@ public class ResourceArmadilloEntity extends Animal {
         if (offspring != null && otherParent instanceof ResourceArmadilloEntity) {
             ResourceArmadilloEntity parent = (ResourceArmadilloEntity) otherParent;
 
-            System.out.println("Breeding parents found!");
-            System.out.println("Parent 1 Production Speed: " + this.productionSpeed);
-            System.out.println("Parent 2 Production Speed: " + parent.productionSpeed);
+            //System.out.println("Breeding parents found!");
+            //System.out.println("Parent 1 Production Speed: " + this.productionSpeed);
+            //System.out.println("Parent 2 Production Speed: " + parent.productionSpeed);
 
             offspring.productionSpeed = (this.productionSpeed + parent.productionSpeed) / 2;
             offspring.productionEfficiency = (this.productionEfficiency + parent.productionEfficiency) / 2;
@@ -181,7 +181,7 @@ public class ResourceArmadilloEntity extends Animal {
                 offspring.setResource(this.random.nextBoolean() ? thisQuality.copy() : otherQuality.copy());
             }
         } else {
-            System.out.println("Breeding failed: offspring or parent is null.");
+            //System.out.println("Breeding failed: offspring or parent is null.");
         }
         return offspring;
     }
@@ -427,8 +427,8 @@ public class ResourceArmadilloEntity extends Animal {
 
             this.resource = BuiltInRegistries.ITEM.get(ResourceLocation.parse(cleanedResource)).getDefaultInstance();
 
-            System.out.println("resource was: " + pCompound.getString("resource_quality"));
-            System.out.println("resource is: " + resource);
+            ////System.out.println("resource was: " + pCompound.getString("resource_quality"));
+            ////System.out.println("resource is: " + resource);
         }
     }
 
@@ -484,13 +484,13 @@ public class ResourceArmadilloEntity extends Animal {
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         } else if (!itemstack.isEmpty() && !itemstack.is(ItemTags.ARMADILLO_FOOD) && !(itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH))) {
             setResource(itemstack);
-            System.out.println("Item used in setResource: " + itemstack.getDisplayName().getString());
-            System.out.println("scuteCount: " + scuteCount);
+            //System.out.println("Item used in setResource: " + itemstack.getDisplayName().getString());
+            //System.out.println("scuteCount: " + scuteCount);
         } else if (itemstack.isEmpty() && !(itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH))) {
-            System.out.println("resource is: " + getResource().getDisplayName().getString());
-            System.out.println("scuteCount is: " + scuteCount);
-            System.out.println("scuteCountTime is: " + scuteCountTime);
-            System.out.println("scuteTime is: " + scuteTime);
+            //System.out.println("resource is: " + getResource().getDisplayName().getString());
+            //System.out.println("scuteCount is: " + scuteCount);
+            //System.out.println("scuteCountTime is: " + scuteCountTime);
+            //System.out.println("scuteTime is: " + scuteTime);
         }
         return this.isScared() ? InteractionResult.FAIL : super.mobInteract(pPlayer, pHand);
     }

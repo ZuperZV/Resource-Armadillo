@@ -19,6 +19,7 @@ public class ModEntities {
                     .sized(0.7F, 0.65F).eyeHeight(0.26F).clientTrackingRange(10).build("resource_armadillo"));
 
 
+
     public static void register(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);
     }

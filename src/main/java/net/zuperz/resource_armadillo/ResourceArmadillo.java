@@ -1,16 +1,17 @@
 package net.zuperz.resource_armadillo;
 
-import net.minecraft.client.model.geom.builders.CubeDeformation;
-import net.minecraft.client.renderer.entity.ArmadilloRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraft.world.entity.SpawnPlacementTypes;
-import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
-import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zuperz.resource_armadillo.block.ModBlocks;
+import net.zuperz.resource_armadillo.block.entity.ModBlockEntities;
+import net.zuperz.resource_armadillo.block.entity.custom.ArmadilloHiveBlockEntity;
+import net.zuperz.resource_armadillo.component.ModDataComponentTypes;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ModEntities;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.client.ModModelLayers;
@@ -19,6 +20,9 @@ import net.zuperz.resource_armadillo.entity.custom.armadillo.client.ResourceArma
 import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceEntityDataSerializers;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceSensorTypes;
 import net.zuperz.resource_armadillo.item.ModItems;
+import net.zuperz.resource_armadillo.recipes.ModRecipes;
+import net.zuperz.resource_armadillo.screen.AtomicOvenScreen;
+import net.zuperz.resource_armadillo.screen.slot.ModMenuTypes;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -43,6 +47,8 @@ public class ResourceArmadillo
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    public static void sendArmadilloHiveInfo(Level p_179511_, BlockPos p_179512_, BlockState p_179513_, ArmadilloHiveBlockEntity p_179514_) {
+    }
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
@@ -52,7 +58,16 @@ public class ResourceArmadillo
         modEventBus.addListener(this::commonSetup);
 
         ModItems.register(modEventBus);
+        ModBlocks.register(modEventBus);
+
+        ModMenuTypes.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
+
+        ModRecipes.SERIALIZERS.register(modEventBus);
+        ModRecipes.RECIPE_TYPES.register(modEventBus);
+
         ModEntities.register(modEventBus);
+        ModDataComponentTypes.register(modEventBus);
 
         ResourceEntityDataSerializers.register(modEventBus);
         ResourceSensorTypes.register(modEventBus);
@@ -90,6 +105,16 @@ public class ResourceArmadillo
         @SubscribeEvent
         public static void registerAttributes(EntityAttributeCreationEvent event) {
             event.put(ModEntities.RESOURCE_ARMADILLO.get(), ResourceArmadilloEntity.createAttributes().build());
+        }
+
+        /*@SubscribeEvent
+        public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
+        }
+         */
+
+        @SubscribeEvent
+        public static void registerScreens(RegisterMenuScreensEvent event) {
+            event.register(ModMenuTypes.ATOMIC_OVEN_MENU.get(), AtomicOvenScreen::new);
         }
     }
 }

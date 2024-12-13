@@ -1,5 +1,7 @@
 package net.zuperz.resource_armadillo.entity.custom.armadillo.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.animation.definitions.ArmadilloAnimation;
 import net.minecraft.client.model.AgeableHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -136,5 +138,10 @@ public class ResourceArmadilloModel extends AgeableHierarchicalModel<ResourceArm
         this.animate(pEntity.rollOutAnimationState, ArmadilloAnimation.ARMADILLO_ROLL_OUT, pAgeInTicks, 1.0F);
         this.animate(pEntity.rollUpAnimationState, ArmadilloAnimation.ARMADILLO_ROLL_UP, pAgeInTicks, 1.0F);
         this.animate(pEntity.peekAnimationState, ArmadilloAnimation.ARMADILLO_PEEK, pAgeInTicks, 1.0F);
+    }
+
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        this.body.render(poseStack, vertexConsumer, packedLight, packedOverlay);
+        this.cube.render(poseStack, vertexConsumer, packedLight, packedOverlay);
     }
 }

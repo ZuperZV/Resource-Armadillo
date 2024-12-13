@@ -6,6 +6,8 @@ import com.mojang.datafixers.util.Pair;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
@@ -32,13 +34,21 @@ import net.minecraft.world.entity.ai.behavior.SetEntityLookTargetSometimes;
 import net.minecraft.world.entity.ai.behavior.SetWalkTargetFromLookTarget;
 import net.minecraft.world.entity.ai.behavior.Swim;
 import net.minecraft.world.entity.ai.behavior.declarative.BehaviorBuilder;
+import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
+import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.entity.ai.sensing.SensorType;
+import net.minecraft.world.entity.animal.Bee;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.Vec3;
+import net.zuperz.resource_armadillo.block.ModBlocks;
+import net.zuperz.resource_armadillo.entity.custom.armadillo.ModEntities;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceSensorTypes;
 
@@ -51,6 +61,7 @@ public class ResourceArmadilloAi {
     private static final double DEFAULT_CLOSE_ENOUGH_DIST = 2.0;
     private static final double BABY_CLOSE_ENOUGH_DIST = 1.0;
     private static final UniformInt ADULT_FOLLOW_RANGE = UniformInt.of(5, 16);
+
 
     private static final ImmutableList<SensorType<? extends Sensor<? super ResourceArmadilloEntity>>> SENSOR_TYPES = ImmutableList.of(
             SensorType.NEAREST_LIVING_ENTITIES,
@@ -77,6 +88,27 @@ public class ResourceArmadilloAi {
             MemoryModuleType.NEAREST_VISIBLE_ADULT,
             MemoryModuleType.DANGER_DETECTED_RECENTLY
     );
+
+    //* Custom *//
+
+    public static void moveToBlock(ResourceArmadilloEntity armadillo, BlockPos targetPos) {
+        armadillo.getBrain().setMemory(MemoryModuleType.WALK_TARGET, new WalkTarget(targetPos, 1.0F, 0));
+    }
+
+    public static BlockPos findAtomicOvenPosition(ServerLevel level) {
+        for (int x = -25; x <= 25; x++) {
+            for (int z = -25; z <= 25; z++) {
+                BlockPos pos = new BlockPos(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z), z);
+                if (level.getBlockState(pos).getBlock() == ModBlocks.ATOMIC_OVEN.get()) {
+                    return pos;
+                }
+            }
+        }
+        return null;
+    }
+
+    //* Armadillo *//
+
     private static final OneShot<ResourceArmadilloEntity> ARMADILLO_ROLLING_OUT = BehaviorBuilder.create(
             p_316587_ -> p_316587_.group(p_316587_.absent(MemoryModuleType.DANGER_DETECTED_RECENTLY))
                     .apply(p_316587_, p_316348_ -> (p_319679_, p_319680_, p_319681_) -> {
@@ -133,7 +165,7 @@ public class ResourceArmadilloAi {
                 Activity.IDLE,
                 ImmutableList.of(
                         Pair.of(0, SetEntityLookTargetSometimes.create(EntityType.PLAYER, 6.0F, UniformInt.of(30, 60))),
-                        Pair.of(1, new AnimalMakeLove(EntityType.ARMADILLO, 1.0F, 1)),
+                        Pair.of(1, new AnimalMakeLove(ModEntities.RESOURCE_ARMADILLO.get(), 1.1F, 1)),
                         Pair.of(
                                 2,
                                 new RunOne<>(
@@ -143,9 +175,24 @@ public class ResourceArmadilloAi {
                                         )
                                 )
                         ),
-                        Pair.of(3, new RandomLookAround(UniformInt.of(150, 250), 30.0F, 0.0F, 0.0F)),
+                        Pair.of(3, new Behavior<ResourceArmadilloEntity>(ImmutableMap.of(), 1) {
+                            @Override
+                            protected void tick(ServerLevel pLevel, ResourceArmadilloEntity pOwner, long pGameTime) {
+                                BlockPos targetPos = findAtomicOvenPosition(pLevel);
+
+                                if (targetPos != null) {
+                                    moveToBlock(pOwner, targetPos);
+                                }
+                            }
+
+                            @Override
+                            protected boolean canStillUse(ServerLevel pLevel, ResourceArmadilloEntity pEntity, long pGameTime) {
+                                return true;
+                            }
+                        }),
+                        Pair.of(5, new RandomLookAround(UniformInt.of(150, 250), 30.0F, 0.0F, 0.0F)),
                         Pair.of(
-                                4,
+                                6,
                                 new RunOne<>(
                                         ImmutableMap.of(MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT),
                                         ImmutableList.of(
@@ -156,6 +203,11 @@ public class ResourceArmadilloAi {
                 )
         );
     }
+
+    private static void moveToHive(ResourceArmadilloEntity armadillo, BlockPos hivePos) {
+        armadillo.getBrain().setMemory(MemoryModuleType.WALK_TARGET, new WalkTarget(hivePos, 1.0F, 0));
+    }
+
 
     private static void initScaredActivity(Brain<ResourceArmadilloEntity> pBrain) {
         pBrain.addActivityWithConditions(

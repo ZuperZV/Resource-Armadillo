@@ -106,6 +106,7 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
     public void tick(Level level, BlockPos pos, BlockState state, AtomicOvenBlockEntity blockEntity) {
         boolean dirty = false;
         detectAndStoreArmadillo(level, pos, blockEntity, state);
+        blockEntity.goingToBeCrafted();
 
         if (blockEntity.fuelBurnTime > 0) {
             blockEntity.fuelBurnTime--;
@@ -136,8 +137,6 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
 
             level.setBlockAndUpdate(pos, state.setValue(AtomicOvenBlock.LIT, false));
         }
-
-        blockEntity.goingToBeCrafted();
 
         if (dirty) {
             blockEntity.setChanged();
@@ -250,11 +249,8 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
                 AtomicOvenRecipe recipe = alcheRecipeOptional.get().value();
                 ItemStack result = recipe.getResultItem(level.registryAccess());
 
-                ItemStack outputStack = inputItems.getStackInSlot(4);
                 System.out.println("result from goingToBeCrafted: " + result.copy());
-                if (outputStack.isEmpty()) {
-                    inputItems.setStackInSlot(4, result.copy());
-                }
+                inputItems.setStackInSlot(4, result.copy());
             }
         }
     }

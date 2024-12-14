@@ -51,6 +51,8 @@ public class AtomicOvenScreen extends AbstractContainerScreen<AtomicOvenMenu> {
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
 
+        updateResourceArmadilloTooltip(pMouseX, pMouseY, x, y);
+
         renderArmadilloAreaTooltip(guiGraphics, pMouseX, pMouseY, x, y);
         renderResourceArmadilloAreaTooltip(guiGraphics, pMouseX, pMouseY, x, y);
     }
@@ -149,6 +151,37 @@ public class AtomicOvenScreen extends AbstractContainerScreen<AtomicOvenMenu> {
         }
     }
 
+    private String lastTooltipText = "";
+
+    private void updateResourceArmadilloTooltip(int pMouseX, int pMouseY, int guiX, int guiY) {
+        if (isMouseAboveArea(pMouseX, pMouseY, guiX, guiY, 120, 32, 25, 25)) {
+            String stringGoingToBeCrafted = menu.blockentity.getSlotInputItems(4).toString();
+            String newTooltipText = null;
+
+            if (stringGoingToBeCrafted != null && !stringGoingToBeCrafted.isEmpty() && menu.blockentity.getProgress() > 0) {
+                String[] parts = stringGoingToBeCrafted.split(":");
+                String itemName = parts.length > 1 ? parts[1] : parts[0];
+                newTooltipText = itemName.substring(0, 1).toUpperCase() + itemName.substring(1) + " Resource Armadillo";
+            }
+            else if (menu.blockentity.getProgress() > 0) {
+                newTooltipText = "Resource Armadillo";
+            } else {
+                newTooltipText = null;
+            }
+
+            if (newTooltipText != null && !newTooltipText.equals(lastTooltipText)) {
+                lastTooltipText = newTooltipText;
+                ResourceArmadilloTooltipTest = new Tooltip(120, 32, newTooltipText, 25, 25);
+            }
+            else if (newTooltipText == null) {
+                lastTooltipText = "";
+                ResourceArmadilloTooltipTest = null;
+            }
+        } else {
+            lastTooltipText = "";
+            ResourceArmadilloTooltipTest = null;
+        }
+    }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {

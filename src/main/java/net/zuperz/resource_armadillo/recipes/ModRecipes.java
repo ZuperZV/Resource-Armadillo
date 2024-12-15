@@ -28,7 +28,7 @@ public class ModRecipes {
 
 
     public static final Supplier<RecipeSerializer<RoostRecipe>> ATOMIC_OVEN_SERIALIZER =
-            SERIALIZERS.register("atomic_oven", () -> RoostRecipe.Serializer.INSTANCE);
+            SERIALIZERS.register("roost", () -> RoostRecipe.Serializer.INSTANCE);
 
     public static final Supplier<RecipeSerializer<ResourceArmadilloEntityRecipe>> RESOURCE_ARMADILLO_SERIALIZER =
             SERIALIZERS.register("resource_armadillo", () -> ResourceArmadilloEntityRecipe.Serializer.INSTANCE);

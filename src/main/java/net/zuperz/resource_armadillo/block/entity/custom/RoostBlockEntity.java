@@ -211,7 +211,7 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
         }
 
         Optional<RecipeHolder<RoostRecipe>> alcheRecipeOptional = level.getRecipeManager()
-                .getRecipeFor(ModRecipes.ATOMIC_OVEN_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
+                .getRecipeFor(ModRecipes.ROOST_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
 
         if (alcheRecipeOptional.isPresent()) {
             if ((getSlotInputItems(3).getItem() == Items.DIRT) || (getSlotInputItems(3).getItem() == Items.STONE)) {
@@ -244,7 +244,7 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
         }
 
         Optional<RecipeHolder<RoostRecipe>> alcheRecipeOptional = level.getRecipeManager()
-                .getRecipeFor(ModRecipes.ATOMIC_OVEN_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
+                .getRecipeFor(ModRecipes.ROOST_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
 
         if (alcheRecipeOptional.isPresent()) {
             if ((getSlotInputItems(3).getItem() == Items.DIRT)) {

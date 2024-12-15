@@ -3,7 +3,6 @@ package net.zuperz.resource_armadillo;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
@@ -21,7 +20,7 @@ import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceEntity
 import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceSensorTypes;
 import net.zuperz.resource_armadillo.item.ModItems;
 import net.zuperz.resource_armadillo.recipes.ModRecipes;
-import net.zuperz.resource_armadillo.screen.AtomicOvenScreen;
+import net.zuperz.resource_armadillo.screen.RoostScreen;
 import net.zuperz.resource_armadillo.screen.slot.ModMenuTypes;
 import org.slf4j.Logger;
 
@@ -114,7 +113,7 @@ public class ResourceArmadillo
 
         @SubscribeEvent
         public static void registerScreens(RegisterMenuScreensEvent event) {
-            event.register(ModMenuTypes.ATOMIC_OVEN_MENU.get(), AtomicOvenScreen::new);
+            event.register(ModMenuTypes.ATOMIC_OVEN_MENU.get(), RoostScreen::new);
         }
     }
 }

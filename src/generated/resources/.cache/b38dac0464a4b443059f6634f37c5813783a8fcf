@@ -1,5 +1,5 @@
-// 1.21	2024-12-11T21:47:34.9263292	Tags for minecraft:block mod id resource_armadillo
+// 1.21	2024-12-14T19:37:12.0680661	Tags for minecraft:block mod id resource_armadillo
 2e4643371b1ce01ac9bbd608d551f992fd7d0e7f data/minecraft/tags/block/mineable/axe.json
-297a89adb3cdd0462f4789bbb44e5b0e4bcdf7f4 data/minecraft/tags/block/mineable/pickaxe.json
-f20009998eedbb3982ecb33539a5970a35069ba1 data/minecraft/tags/block/needs_iron_tool.json
+63be390293ed7b89c3ec87bf94f290e9a94395b7 data/minecraft/tags/block/mineable/pickaxe.json
+9ba97f39ed8ab3bd398584b8096ca1c41fa31f39 data/minecraft/tags/block/needs_iron_tool.json
 2e4643371b1ce01ac9bbd608d551f992fd7d0e7f data/minecraft/tags/block/needs_stone_tool.json

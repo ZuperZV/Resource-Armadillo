@@ -19,7 +19,6 @@ public class ModBlockStateProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         blockWithItem(ModBlocks.ARMADILLO_HIVE);
-        blockWithItem(ModBlocks.ATOMIC_OVEN);
     }
 
     private void blockWithItem(DeferredBlock<Block> deferredBlock) {

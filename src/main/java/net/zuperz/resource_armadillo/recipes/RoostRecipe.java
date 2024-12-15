@@ -12,13 +12,13 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
 
-public class AtomicOvenRecipe implements Recipe<RecipeInput> {
+public class RoostRecipe implements Recipe<RecipeInput> {
 
     public final ItemStack output;
     public final Ingredient ingredient0;
     public final Ingredient ingredientoven;
 
-    public AtomicOvenRecipe(ItemStack output, Ingredient ingredient0, Ingredient ingredientoven) {
+    public RoostRecipe(ItemStack output, Ingredient ingredient0, Ingredient ingredientoven) {
         this.output = output;
         this.ingredient0 = ingredient0;
         this.ingredientoven = ingredientoven;
@@ -29,7 +29,7 @@ public class AtomicOvenRecipe implements Recipe<RecipeInput> {
     }
 
     public ResourceLocation getId() {
-        return ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "atomic_oven");
+        return ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "roost");
     }
     @Override
     public ItemStack getResultItem(HolderLookup.Provider registries) {
@@ -62,7 +62,7 @@ public class AtomicOvenRecipe implements Recipe<RecipeInput> {
     }
     @Override
     public String getGroup() {
-        return "atomic_oven";
+        return "roost";
     }
 
     @Override
@@ -75,49 +75,49 @@ public class AtomicOvenRecipe implements Recipe<RecipeInput> {
         return Type.INSTANCE;
     }
 
-    public static final class Type implements RecipeType<AtomicOvenRecipe> {
+    public static final class Type implements RecipeType<RoostRecipe> {
         private Type() { }
         public static final Type INSTANCE = new Type();
-        public static final String ID = "atomic_oven";
+        public static final String ID = "roost";
     }
-    public static final class Serializer implements RecipeSerializer<AtomicOvenRecipe> {
+    public static final class Serializer implements RecipeSerializer<RoostRecipe> {
         private Serializer() {}
         public static final Serializer INSTANCE = new Serializer();
         public static final ResourceLocation ID =
-                ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "atomic_oven");
+                ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "roost");
 
-        private final MapCodec<AtomicOvenRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> {
+        private final MapCodec<RoostRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> {
             return instance.group(CodecFix.ITEM_STACK_CODEC.fieldOf("output").forGetter((recipe) -> {
                 return recipe.output;
-            }), Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter((recipe) -> {
+            }), Ingredient.CODEC_NONEMPTY.fieldOf("ingredient_1").forGetter((recipe) -> {
                 return recipe.ingredient0;
-            }), Ingredient.CODEC_NONEMPTY.fieldOf("oven_ingredient").forGetter((recipe) -> {
+            }), Ingredient.CODEC_NONEMPTY.fieldOf("ingredient_2").forGetter((recipe) -> {
                 return recipe.ingredientoven;
-            })).apply(instance, AtomicOvenRecipe::new);
+            })).apply(instance, RoostRecipe::new);
         });
 
-        private final StreamCodec<RegistryFriendlyByteBuf, AtomicOvenRecipe> STREAM_CODEC = StreamCodec.of(
+        private final StreamCodec<RegistryFriendlyByteBuf, RoostRecipe> STREAM_CODEC = StreamCodec.of(
                 Serializer::write, Serializer::read);
 
         @Override
-        public MapCodec<AtomicOvenRecipe> codec() {
+        public MapCodec<RoostRecipe> codec() {
             return CODEC;
         }
 
         @Override
-        public StreamCodec<RegistryFriendlyByteBuf, AtomicOvenRecipe> streamCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, RoostRecipe> streamCodec() {
             return STREAM_CODEC;
         }
 
-        private static AtomicOvenRecipe read(RegistryFriendlyByteBuf  buffer) {
+        private static RoostRecipe read(RegistryFriendlyByteBuf  buffer) {
             Ingredient input0 = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
             Ingredient input1 = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
             ItemStack output = ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer);
 
-            return new AtomicOvenRecipe(output, input0 , input1);
+            return new RoostRecipe(output, input0 , input1);
         }
 
-        private static void write(RegistryFriendlyByteBuf  buffer, AtomicOvenRecipe recipe) {
+        private static void write(RegistryFriendlyByteBuf  buffer, RoostRecipe recipe) {
             Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.ingredient0);
             Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.ingredientoven);
             ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, recipe.output);

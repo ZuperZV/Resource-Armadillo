@@ -1,7 +1,6 @@
 package net.zuperz.resource_armadillo.block;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.BlockGetter;
@@ -9,15 +8,12 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.minecraft.world.level.material.MapColor;
-import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
 import net.zuperz.resource_armadillo.block.custom.ArmadilloHiveBlock;
-import net.zuperz.resource_armadillo.block.custom.AtomicOvenBlock;
+import net.zuperz.resource_armadillo.block.custom.RoostBlock;
 import net.zuperz.resource_armadillo.item.ModItems;
 
 import java.util.function.Supplier;
@@ -27,8 +23,8 @@ public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS =
             DeferredRegister.createBlocks(ResourceArmadillo.MOD_ID);
 
-    public static final DeferredBlock<Block> ATOMIC_OVEN = registerBlock("atomic_oven",
-            () -> new AtomicOvenBlock(BlockBehaviour.Properties.of().requiresCorrectToolForDrops().strength(5.0F, 6.0F).noOcclusion()));
+    public static final DeferredBlock<Block> ROOST = registerBlock("roost",
+            () -> new RoostBlock(BlockBehaviour.Properties.of().requiresCorrectToolForDrops().strength(5.0F, 6.0F).noOcclusion()));
 
     public static final DeferredBlock<Block> ARMADILLO_HIVE = registerBlock("armadillo_hive",
             () -> new ArmadilloHiveBlock(BlockBehaviour.Properties.of().requiresCorrectToolForDrops().strength(5.0F, 6.0F).noOcclusion()));

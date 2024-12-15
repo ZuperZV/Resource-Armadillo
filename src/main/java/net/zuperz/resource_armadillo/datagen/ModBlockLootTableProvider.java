@@ -33,7 +33,7 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     @Override
     protected void generate() {
         dropSelf(ModBlocks.ARMADILLO_HIVE.get());
-        dropSelf(ModBlocks.ATOMIC_OVEN.get());
+        dropSelf(ModBlocks.ROOST.get());
     }
 
     protected LootTable.Builder createMultipleOreDrops(Block pBlock, Item item, float minDrops, float maxDrops) {

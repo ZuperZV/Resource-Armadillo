@@ -20,15 +20,15 @@ public class ModRecipes {
         SERIALIZERS.register(eventBus);
     }
 
-    public static final Supplier<RecipeType<AtomicOvenRecipe>> ATOMIC_OVEN_RECIPE_TYPE =
-            RECIPE_TYPES.register("atomic_oven", () -> AtomicOvenRecipe.Type.INSTANCE);
+    public static final Supplier<RecipeType<RoostRecipe>> ROOST_RECIPE_TYPE =
+            RECIPE_TYPES.register("roost", () -> RoostRecipe.Type.INSTANCE);
 
     public static final Supplier<RecipeType<ResourceArmadilloEntityRecipe>> RESOURCE_ARMADILLO_RECIPE_TYPE =
             RECIPE_TYPES.register("resource_armadillo", () -> ResourceArmadilloEntityRecipe.Type.INSTANCE);
 
 
-    public static final Supplier<RecipeSerializer<AtomicOvenRecipe>> ATOMIC_OVEN_SERIALIZER =
-            SERIALIZERS.register("atomic_oven", () -> AtomicOvenRecipe.Serializer.INSTANCE);
+    public static final Supplier<RecipeSerializer<RoostRecipe>> ATOMIC_OVEN_SERIALIZER =
+            SERIALIZERS.register("atomic_oven", () -> RoostRecipe.Serializer.INSTANCE);
 
     public static final Supplier<RecipeSerializer<ResourceArmadilloEntityRecipe>> RESOURCE_ARMADILLO_SERIALIZER =
             SERIALIZERS.register("resource_armadillo", () -> ResourceArmadilloEntityRecipe.Serializer.INSTANCE);

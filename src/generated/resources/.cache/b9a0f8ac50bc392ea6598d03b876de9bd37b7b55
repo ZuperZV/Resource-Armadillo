@@ -1,7 +1,4 @@
-// 1.21	2024-12-11T21:47:34.9253085	Block States: resource_armadillo
+// 1.21	2024-12-14T19:37:12.0670609	Block States: resource_armadillo
 36f07e1b81d27033b9e3a19002139f5b609ba8ce assets/resource_armadillo/blockstates/armadillo_hive.json
-955fb4d1a83b79704713dec45fc2531cf4f15cf6 assets/resource_armadillo/blockstates/atomic_oven.json
 7ad36e74231032f4dcfedf4849718c4a95900dc8 assets/resource_armadillo/models/block/armadillo_hive.json
-ae92c41ab81bde8c8fa201b84df52685c1a145fb assets/resource_armadillo/models/block/atomic_oven.json
 ffed08147297d54cea41bc3a42ab1bde09c441b5 assets/resource_armadillo/models/item/armadillo_hive.json
-d246bb4a3839c3af947182e084c0b4c27c620040 assets/resource_armadillo/models/item/atomic_oven.json

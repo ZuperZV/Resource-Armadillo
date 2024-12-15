@@ -278,6 +278,12 @@ public class ResourceArmadilloEntity extends Animal {
         super.customServerAiStep();
     }
 
+    public boolean setBabyAge(int Age) {
+        this.setAge(Age);
+        return true;
+    }
+
+
     private int pickNextScuteDropTime() {
         return 22 * (10 + this.random.nextInt(30, 200));
     }

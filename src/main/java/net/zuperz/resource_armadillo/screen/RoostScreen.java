@@ -1,7 +1,6 @@
 package net.zuperz.resource_armadillo.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -12,29 +11,26 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
-import net.zuperz.resource_armadillo.block.entity.custom.AtomicOvenBlockEntity;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ModEntities;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
 import net.zuperz.resource_armadillo.screen.renderer.Tooltip;
-import net.zuperz.resource_armadillo.util.ModTags;
 import net.zuperz.resource_armadillo.util.MouseUtil;
+import org.apache.logging.log4j.core.appender.rolling.action.IfAccumulatedFileCount;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.Optional;
 
-public class AtomicOvenScreen extends AbstractContainerScreen<AtomicOvenMenu> {
+public class RoostScreen extends AbstractContainerScreen<RoostMenu> {
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "textures/gui/atomic_oven_gui.png");
     private Tooltip ArmadilloTooltipTest;
     private Tooltip ResourceArmadilloTooltipTest;
 
-    public AtomicOvenScreen(AtomicOvenMenu container, Inventory inventory, Component title) {
+    public RoostScreen(RoostMenu container, Inventory inventory, Component title) {
         super(container, inventory, title);
     }
 
@@ -76,13 +72,21 @@ public class AtomicOvenScreen extends AbstractContainerScreen<AtomicOvenMenu> {
         Level level = Minecraft.getInstance().level;
         if (level != null) {
             if (menu.isCrafting()) {
+
+                int size = 0;
+                if (menu.isSlotItem(3).getItem() == Items.STONE) {
+                    size = 1;
+                }
+
+                int scaledProgress = size == 1 ? menu.getBabyScaledEntityProgress() : menu.getScaledEntityProgress();
+
                 ResourceArmadilloEntity armadillo = ModEntities.RESOURCE_ARMADILLO.get().create(level);
                 if (armadillo != null) {
                     armadillo.setPos(0, 0, 0);
                     InventoryScreen.renderEntityInInventory(
                             guiGraphics,
                             x + 132, y + 52,
-                            menu.getScaledEntityProgress(),
+                            scaledProgress,
                             new Vector3f(0, 0, 0),
                             new Quaternionf().rotationYXZ((float) Math.PI / 1.5f, 0, (float) Math.PI),
                             null,
@@ -92,8 +96,13 @@ public class AtomicOvenScreen extends AbstractContainerScreen<AtomicOvenMenu> {
             }
         }
 
+
         if (level != null) {
-            if (menu.isSlotItem(3).getItem() == Items.DIRT) {
+            if (menu.isSlotItem(3).getItem() == Items.DIRT || menu.isSlotItem(3).getItem() == Items.STONE) {
+                int size = 20;
+                if (menu.isSlotItem(3).getItem() == Items.STONE) {
+                    size = 10;
+                }
 
                 Armadillo armadillo = EntityType.ARMADILLO.create(level);
                 if (armadillo != null) {
@@ -101,7 +110,7 @@ public class AtomicOvenScreen extends AbstractContainerScreen<AtomicOvenMenu> {
                     InventoryScreen.renderEntityInInventory(
                             guiGraphics,
                             x + 58, y + 32,
-                            20,
+                            size,
                             new Vector3f(0, 0, 0),
                             new Quaternionf().rotationYXZ((float) Math.PI / 1.5f, 0, (float) Math.PI),
                             null,
@@ -114,7 +123,7 @@ public class AtomicOvenScreen extends AbstractContainerScreen<AtomicOvenMenu> {
 
     private void renderArmadilloAreaTooltip(GuiGraphics guiGraphics, int pMouseX, int pMouseY, int x, int y) {
         if(isMouseAboveArea(pMouseX, pMouseY, x, y, 46, 11, 25, 25)) {
-            if (menu.isSlotItem(3).getItem() == Items.DIRT) {
+            if (menu.isSlotItem(3).getItem() == Items.DIRT || menu.isSlotItem(3).getItem() == Items.STONE) {
                 guiGraphics.renderTooltip(this.font, ArmadilloTooltipTest.getTooltips(),
                         Optional.empty(), pMouseX - x, pMouseY - y);
             }
@@ -122,14 +131,23 @@ public class AtomicOvenScreen extends AbstractContainerScreen<AtomicOvenMenu> {
     }
 
     private void ArmadilloTooltip() {
+        String newTooltipText;
+        if (menu.isSlotItem(3).getItem() == Items.STONE) {
+            newTooltipText = "Baby Armadillo";
+        } else {
+            newTooltipText = "Armadillo";
+        }
         ArmadilloTooltipTest = new Tooltip(46,
-                11, "Armadillo", 25, 25);
+                11, newTooltipText, 25, 25);
     }
+
+
+
 
     private void renderResourceArmadilloAreaTooltip(GuiGraphics guiGraphics, int pMouseX, int pMouseY, int x, int y) {
         if (isMouseAboveArea(pMouseX, pMouseY, x, y, 120, 32, 25, 25)) {
             if (ResourceArmadilloTooltipTest != null) {
-                if (menu.isSlotItem(3).getItem() == Items.DIRT) {
+                if (menu.isSlotItem(3).getItem() == Items.DIRT || menu.isSlotItem(3).getItem() == Items.STONE) {
                     guiGraphics.renderTooltip(this.font, ResourceArmadilloTooltipTest.getTooltips(),
                             Optional.empty(), pMouseX - x, pMouseY - y);
                 }
@@ -157,14 +175,26 @@ public class AtomicOvenScreen extends AbstractContainerScreen<AtomicOvenMenu> {
         if (isMouseAboveArea(pMouseX, pMouseY, guiX, guiY, 120, 32, 25, 25)) {
             String stringGoingToBeCrafted = menu.blockentity.getSlotInputItems(4).toString();
             String newTooltipText = null;
+            int size = 0;
+            if (menu.isSlotItem(3).getItem() == Items.STONE) {
+                size = 1;
+            }
 
             if (stringGoingToBeCrafted != null && !stringGoingToBeCrafted.isEmpty() && menu.blockentity.getProgress() > 0) {
                 String[] parts = stringGoingToBeCrafted.split(":");
+                String babyText = "";
+                if (size == 1) {
+                    babyText = "Baby ";
+                }
                 String itemName = parts.length > 1 ? parts[1] : parts[0];
-                newTooltipText = itemName.substring(0, 1).toUpperCase() + itemName.substring(1) + " Resource Armadillo";
+                newTooltipText = babyText + itemName.substring(0, 1).toUpperCase() + itemName.substring(1) + " Resource Armadillo";
             }
+
             else if (menu.blockentity.getProgress() > 0) {
                 newTooltipText = "Resource Armadillo";
+                if (size == 1) {
+                    newTooltipText = "Baby Resource Armadillo";
+                }
             } else {
                 newTooltipText = null;
             }

@@ -21,11 +21,12 @@ public class ModBlockTagProvider extends BlockTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider pProvider) {
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
-                .add(ModBlocks.ATOMIC_OVEN.get())
+                .add(ModBlocks.ROOST.get())
                 .add(ModBlocks.ARMADILLO_HIVE.get());
 
-        this.tag(BlockTags.NEEDS_IRON_TOOL)
-                .add(ModBlocks.ATOMIC_OVEN.get());
+        this.tag(BlockTags.NEEDS_STONE_TOOL)
+                .add(ModBlocks.ROOST.get())
+                .add(ModBlocks.ARMADILLO_HIVE.get());
 
         this.tag(BlockTags.NEEDS_STONE_TOOL)
                 .add(ModBlocks.ARMADILLO_HIVE.get());

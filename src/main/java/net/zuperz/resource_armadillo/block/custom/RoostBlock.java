@@ -11,7 +11,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -30,38 +29,63 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.zuperz.resource_armadillo.block.entity.custom.AtomicOvenBlockEntity;
-import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
+import net.zuperz.resource_armadillo.block.entity.custom.RoostBlockEntity;
 
 import javax.annotation.Nullable;
 
-public class AtomicOvenBlock extends Block implements EntityBlock {
+public class RoostBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static BooleanProperty ARMADILLO_DATA = BooleanProperty.create("armadillo_data");
-    static VoxelShape SHAPE = Shapes.or(
-            box(0, 0, 0, 16, 9, 16),
 
-            box(0.5, 9, 0.5, 2.5, 18, 2.5),
+    private static final VoxelShape SHAPE_NORTH = Shapes.or(
+            box(0.875, 4, 0.625, 15.375, 6, 15.125),
 
-            box(0.5, 9, 13.5, 2.5, 18, 15.5),
+            box(2.125, 6, 1.375, 14.125, 8, 13.875),
 
-            box(13.5, 9, 0.5, 15.5, 18, 2.5),
+            box(13.875, 6, 1.875, 14.875, 13, 13.875),
 
-            box(13.5, 9, 13.5, 15.5, 18, 15.5)
+            box(1.375, 6, 2.125, 2.375, 13, 14.125),
+
+            box(1.875, 6, 13.625, 13.875, 14, 14.625),
+
+            box(1.125, 6, 0.875, 3.125, 15, 2.875),
+
+            box(13.125, 6, 12.875, 15.125, 15, 14.875),
+
+            box(1.125, 6, 13.125, 3.125, 15, 15.125),
+
+            box(13.125, 6, 0.875, 15.125, 15, 2.875),
+
+            box(0.125, 0, -0.125, 16.125, 4, 15.875)
     );
+
+    private static final VoxelShape SHAPE_EAST = rotateShape(Direction.NORTH, Direction.EAST, SHAPE_NORTH);
+    private static final VoxelShape SHAPE_SOUTH = rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_NORTH);
+    private static final VoxelShape SHAPE_WEST = rotateShape(Direction.NORTH, Direction.WEST, SHAPE_NORTH);
 
     //* Rescource Armadillo *//
 
 
 
-    public AtomicOvenBlock(Properties properties) {
+    public RoostBlock(Properties properties) {
         super(Properties.of());
     }
 
     @Override
-    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        return SHAPE;
+    protected VoxelShape getShape(BlockState p_54561_, BlockGetter p_54562_, BlockPos p_54563_, CollisionContext p_54564_) {
+        switch ((Direction)p_54561_.getValue(FACING)) {
+            case NORTH:
+                return SHAPE_NORTH;
+            case SOUTH:
+                return SHAPE_SOUTH;
+            case EAST:
+                return SHAPE_EAST;
+            case WEST:
+                return SHAPE_WEST;
+            default:
+                return SHAPE_NORTH;
+        }
     }
 
     @Override
@@ -94,7 +118,7 @@ public class AtomicOvenBlock extends Block implements EntityBlock {
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new AtomicOvenBlockEntity(pos, state);
+        return new RoostBlockEntity(pos, state);
     }
 
     @Override
@@ -102,7 +126,7 @@ public class AtomicOvenBlock extends Block implements EntityBlock {
         if (level.isClientSide) return null;
 
         return (lvl, pos, st, blockEntity) -> {
-            if (blockEntity instanceof AtomicOvenBlockEntity tile) {
+            if (blockEntity instanceof RoostBlockEntity tile) {
                 tile.tick(level, pos, state, tile);
             }
         };
@@ -113,8 +137,8 @@ public class AtomicOvenBlock extends Block implements EntityBlock {
         if (!level.isClientSide()) {
             BlockEntity entity = level.getBlockEntity(pos);
             ServerPlayer theplayer = (ServerPlayer) player;
-            if(entity instanceof AtomicOvenBlockEntity) {
-                theplayer.openMenu((AtomicOvenBlockEntity)entity, pos);
+            if(entity instanceof RoostBlockEntity) {
+                theplayer.openMenu((RoostBlockEntity)entity, pos);
             } else {
                 throw new IllegalStateException("Our Container provider is missing!");
             }
@@ -127,8 +151,8 @@ public class AtomicOvenBlock extends Block implements EntityBlock {
         if (!level.isClientSide()) {
             BlockEntity entity = level.getBlockEntity(pos);
             ServerPlayer theplayer = (ServerPlayer) player;
-            if(entity instanceof AtomicOvenBlockEntity) {
-                theplayer.openMenu((AtomicOvenBlockEntity)entity, pos);
+            if(entity instanceof RoostBlockEntity) {
+                theplayer.openMenu((RoostBlockEntity)entity, pos);
             } else {
                 throw new IllegalStateException("Our Container provider is missing!");
             }
@@ -140,7 +164,7 @@ public class AtomicOvenBlock extends Block implements EntityBlock {
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (state.getBlock() != newState.getBlock()) {
-            if (level.getBlockEntity(pos) instanceof AtomicOvenBlockEntity furnace) {
+            if (level.getBlockEntity(pos) instanceof RoostBlockEntity furnace) {
                 furnace.setItem(3, ItemStack.EMPTY);
                 furnace.dropItems();
             }
@@ -178,10 +202,23 @@ public class AtomicOvenBlock extends Block implements EntityBlock {
             level.addParticle(ParticleTypes.SMOKE, d0 + d5, d1 + d6, d2 + d7, 0.0, 0.0, 0.0);
             level.addParticle(ParticleTypes.FLAME, d0 + d5, d1 + d6, d2 + d7, 0.0, 0.0, 0.0);
 
-            if(level.getBlockEntity(pos) instanceof AtomicOvenBlockEntity AtomicOvenBlockEntity && !AtomicOvenBlockEntity.getInputItems().getStackInSlot(1).isEmpty()) {
+            if(level.getBlockEntity(pos) instanceof RoostBlockEntity AtomicOvenBlockEntity && !AtomicOvenBlockEntity.getInputItems().getStackInSlot(1).isEmpty()) {
                 level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, AtomicOvenBlockEntity.getInputItems().getStackInSlot(1)),
-                        xPos + xOffsets, yPos + yOffset, zPos + zOffset, 0.0, 0.0, 0.0);
+                        xPos + xOffsets, yPos + yOffset, zPos + zOffset, 0.002, 0.001, 0.002);
             }
         }
+    }
+
+    public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {
+        VoxelShape[] buffer = new VoxelShape[]{shape, Shapes.empty()};
+
+        int times = (to.get2DDataValue() - from.get2DDataValue() + 4) % 4;
+        for (int i = 0; i < times; i++) {
+            buffer[0].forAllBoxes((minX, minY, minZ, maxX, maxY, maxZ) -> buffer[1] = Shapes.or(buffer[1], Shapes.box(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX)));
+            buffer[0] = buffer[1];
+            buffer[1] = Shapes.empty();
+        }
+
+        return buffer[0];
     }
 }

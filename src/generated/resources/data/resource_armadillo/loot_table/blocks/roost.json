@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "resource_armadillo:atomic_oven"
+          "name": "resource_armadillo:roost"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "resource_armadillo:blocks/atomic_oven"
+  "random_sequence": "resource_armadillo:blocks/roost"
 }

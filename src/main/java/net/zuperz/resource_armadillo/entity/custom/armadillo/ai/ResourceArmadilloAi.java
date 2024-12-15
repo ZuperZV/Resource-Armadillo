@@ -99,7 +99,7 @@ public class ResourceArmadilloAi {
         for (int x = -25; x <= 25; x++) {
             for (int z = -25; z <= 25; z++) {
                 BlockPos pos = new BlockPos(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z), z);
-                if (level.getBlockState(pos).getBlock() == ModBlocks.ATOMIC_OVEN.get()) {
+                if (level.getBlockState(pos).getBlock() == ModBlocks.ROOST.get()) {
                     return pos;
                 }
             }

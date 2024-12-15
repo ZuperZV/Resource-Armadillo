@@ -48,8 +48,10 @@ public class ResourceArmadilloRenderer extends MobRenderer<ResourceArmadilloEnti
                 poseStack.scale(scale, scale, scale);
             }
 
+
             VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityTranslucent(OVERLAY_TEXTURE));
-            this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+            this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.pack(15, 4), 30.6F, 40.0F, 18.0F, 1.0F);
+
 
             poseStack.popPose();
         }

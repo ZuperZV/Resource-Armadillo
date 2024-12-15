@@ -9,18 +9,18 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.zuperz.resource_armadillo.block.ModBlocks;
-import net.zuperz.resource_armadillo.block.entity.custom.AtomicOvenBlockEntity;
+import net.zuperz.resource_armadillo.block.entity.custom.RoostBlockEntity;
 import net.zuperz.resource_armadillo.screen.slot.ModMenuTypes;
 
-public class AtomicOvenMenu extends AbstractContainerMenu {
+public class RoostMenu extends AbstractContainerMenu {
     private final BlockPos pos;
-    public final AtomicOvenBlockEntity blockentity;
-    public AtomicOvenMenu(int containerId, Player player, BlockPos pos) {
+    public final RoostBlockEntity blockentity;
+    public RoostMenu(int containerId, Player player, BlockPos pos) {
         super(ModMenuTypes.ATOMIC_OVEN_MENU.get(), containerId);
-        AtomicOvenBlockEntity AtomicOvenBlockEntity;
+        RoostBlockEntity AtomicOvenBlockEntity;
         this.pos = pos;
 
-        if (player.level().getBlockEntity(pos) instanceof AtomicOvenBlockEntity blockentity) {
+        if (player.level().getBlockEntity(pos) instanceof RoostBlockEntity blockentity) {
             AtomicOvenBlockEntity = blockentity;
             this.addDataSlots(blockentity.data);
 
@@ -48,7 +48,7 @@ public class AtomicOvenMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return stillValid(ContainerLevelAccess.create(blockentity.getLevel(), blockentity.getBlockPos()), player, ModBlocks.ATOMIC_OVEN.get());
+        return stillValid(ContainerLevelAccess.create(blockentity.getLevel(), blockentity.getBlockPos()), player, ModBlocks.ROOST.get());
     }
 
     // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
@@ -109,10 +109,6 @@ public class AtomicOvenMenu extends AbstractContainerMenu {
         return blockentity.getSlotInputItems(slot);
     }
 
-    public boolean hasArmadillo() {
-        return blockentity.hasArmadillo();
-    }
-
     public int getScaledProgress() {
         int progress = blockentity.data.get(0);
         int maxProgress = blockentity.data.get(1);
@@ -133,8 +129,13 @@ public class AtomicOvenMenu extends AbstractContainerMenu {
     public int getScaledEntityProgress() {
         int progress = blockentity.data.get(0);
         return progress != 0 ? progress * 22 / 22 / 14 : 0;
-
     }
+
+    public int getBabyScaledEntityProgress() {
+        int progress = blockentity.data.get(0);
+        return progress != 0 ? progress * 22 / 22 / 14 /2 : 0;
+    }
+
 
 
 

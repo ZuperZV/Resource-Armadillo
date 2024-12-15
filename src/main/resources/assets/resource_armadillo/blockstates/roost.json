@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "facing=east,lit=false": {
+      "model": "resource_armadillo:block/roost",
+      "y": 90
+    },
+    "facing=north,lit=false": {
+      "model": "resource_armadillo:block/roost"
+    },
+    "facing=south,lit=false": {
+      "model": "resource_armadillo:block/roost",
+      "y": 180
+    },
+    "facing=west,lit=false": {
+      "model": "resource_armadillo:block/roost",
+      "y": 270
+    },
+    
+    
+    "facing=east,lit=true": {
+      "model": "resource_armadillo:block/roost_on",
+      "y": 90
+    },
+    "facing=north,lit=true": {
+      "model": "resource_armadillo:block/roost_on"
+    },
+    "facing=south,lit=true": {
+      "model": "resource_armadillo:block/roost_on",
+      "y": 180
+    },
+    "facing=west,lit=true": {
+      "model": "resource_armadillo:block/roost_on",
+      "y": 270
+    }
+  }
+}

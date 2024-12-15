@@ -1,11 +1,11 @@
 {
-  "type": "resource_armadillo:atomic_oven",
+  "type": "resource_armadillo:roost",
 
-  "ingredient": {
+  "ingredient_1": {
     "item": "minecraft:diamond_ore"
   },
 
-  "oven_ingredient": {
+  "ingredient_2": {
     "item": "minecraft:cobblestone"
   },
 

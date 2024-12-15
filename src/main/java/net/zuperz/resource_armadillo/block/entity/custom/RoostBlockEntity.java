@@ -33,21 +33,20 @@ import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
-import net.zuperz.resource_armadillo.block.custom.AtomicOvenBlock;
+import net.zuperz.resource_armadillo.block.custom.RoostBlock;
 import net.zuperz.resource_armadillo.block.entity.ItemHandler.CustomItemHandler;
 import net.zuperz.resource_armadillo.block.entity.ModBlockEntities;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ModEntities;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
-import net.zuperz.resource_armadillo.recipes.AtomicOvenRecipe;
+import net.zuperz.resource_armadillo.recipes.RoostRecipe;
 import net.zuperz.resource_armadillo.recipes.ModRecipes;
-import net.zuperz.resource_armadillo.screen.AtomicOvenMenu;
+import net.zuperz.resource_armadillo.screen.RoostMenu;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 
-public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, WorldlyContainer {
-    private static boolean armadilloData;
+public class RoostBlockEntity extends BlockEntity implements MenuProvider, WorldlyContainer {
 
     private final ItemStackHandler inputItems = createItemHandler(5);
     private final ItemStackHandler outputItems = createItemHandler(1);
@@ -68,15 +67,15 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
 
     public final ContainerData data;
 
-    public AtomicOvenBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.ATOMIC_OVEN_BLOCK_ENTITY.get(), pos, state);
+    public RoostBlockEntity(BlockPos pos, BlockState state) {
+        super(ModBlockEntities.ROOST_BLOCK_ENTITY.get(), pos, state);
         this.data = new ContainerData() {
             @Override
             public int get(int pIndex) {
                 return switch (pIndex) {
-                    case 0 -> AtomicOvenBlockEntity.this.progress;
-                    case 1 -> AtomicOvenBlockEntity.this.maxProgress;
-                    case 2 -> AtomicOvenBlockEntity.this.fuelBurnTime;
+                    case 0 -> RoostBlockEntity.this.progress;
+                    case 1 -> RoostBlockEntity.this.maxProgress;
+                    case 2 -> RoostBlockEntity.this.fuelBurnTime;
                     default -> 0;
                 };
             }
@@ -84,9 +83,9 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
             @Override
             public void set(int pIndex, int pValue) {
                 switch (pIndex) {
-                    case 0 -> AtomicOvenBlockEntity.this.progress = pValue;
-                    case 1 -> AtomicOvenBlockEntity.this.maxProgress = pValue;
-                    case 2 -> AtomicOvenBlockEntity.this.fuelBurnTime = pValue;
+                    case 0 -> RoostBlockEntity.this.progress = pValue;
+                    case 1 -> RoostBlockEntity.this.maxProgress = pValue;
+                    case 2 -> RoostBlockEntity.this.fuelBurnTime = pValue;
                 }
             }
 
@@ -103,7 +102,7 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
 
     /* Block Entity */
 
-    public void tick(Level level, BlockPos pos, BlockState state, AtomicOvenBlockEntity blockEntity) {
+    public void tick(Level level, BlockPos pos, BlockState state, RoostBlockEntity blockEntity) {
         boolean dirty = false;
         detectAndStoreArmadillo(level, pos, blockEntity, state);
         blockEntity.goingToBeCrafted();
@@ -120,9 +119,14 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
             }
         }
 
+        if (blockEntity.fuelBurnTime > 0) {
+            level.setBlockAndUpdate(pos, state.setValue(RoostBlock.LIT, true));
+        } else {
+            level.setBlockAndUpdate(pos, state.setValue(RoostBlock.LIT, false));
+        }
+
         if (blockEntity.fuelBurnTime > 0 && blockEntity.hasRecipe()) {
             blockEntity.progress++;
-            level.setBlockAndUpdate(pos, state.setValue(AtomicOvenBlock.LIT, true));
             if (blockEntity.progress >= blockEntity.maxProgress) {
                 blockEntity.craftItem(blockEntity);
                 blockEntity.progress = 0;
@@ -134,8 +138,6 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
                 blockEntity.progress = Math.max(blockEntity.progress - 2, 0);
                 dirty = true;
             }
-
-            level.setBlockAndUpdate(pos, state.setValue(AtomicOvenBlock.LIT, false));
         }
 
         if (dirty) {
@@ -158,7 +160,7 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     private boolean hasRecipe() {
-        if ((getSlotInputItems(3).getItem() == Items.DIRT)) {
+        if ((getSlotInputItems(3).getItem() == Items.DIRT) || (getSlotInputItems(3).getItem() == Items.STONE)) {
             Level level = this.level;
             if (level == null) return false;
 
@@ -167,8 +169,8 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
                 inventory.setItem(i, inputItems.getStackInSlot(i));
             }
 
-            Optional<RecipeHolder<AtomicOvenRecipe>> alcheRecipe = level.getRecipeManager()
-                    .getRecipeFor(ModRecipes.ATOMIC_OVEN_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
+            Optional<RecipeHolder<RoostRecipe>> alcheRecipe = level.getRecipeManager()
+                    .getRecipeFor(ModRecipes.ROOST_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
 
 
             return (alcheRecipe.isPresent() && canInsertAmountIntoOutputSlot(inventory));
@@ -199,7 +201,7 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
 
-    private void craftItem(AtomicOvenBlockEntity serverLevel) {
+    private void craftItem(RoostBlockEntity serverLevel) {
         Level level = this.level;
         if (level == null) return;
 
@@ -208,12 +210,12 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
             inventory.setItem(i, inputItems.getStackInSlot(i));
         }
 
-        Optional<RecipeHolder<AtomicOvenRecipe>> alcheRecipeOptional = level.getRecipeManager()
+        Optional<RecipeHolder<RoostRecipe>> alcheRecipeOptional = level.getRecipeManager()
                 .getRecipeFor(ModRecipes.ATOMIC_OVEN_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
 
         if (alcheRecipeOptional.isPresent()) {
-            if ((getSlotInputItems(3).getItem() == Items.DIRT)) {
-                AtomicOvenRecipe recipe = alcheRecipeOptional.get().value();
+            if ((getSlotInputItems(3).getItem() == Items.DIRT) || (getSlotInputItems(3).getItem() == Items.STONE)) {
+                RoostRecipe recipe = alcheRecipeOptional.get().value();
                 ItemStack result = recipe.getResultItem(level.registryAccess());
 
                 ItemStack outputStack = outputItems.getStackInSlot(0);
@@ -241,12 +243,12 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
             inventory.setItem(i, inputItems.getStackInSlot(i));
         }
 
-        Optional<RecipeHolder<AtomicOvenRecipe>> alcheRecipeOptional = level.getRecipeManager()
+        Optional<RecipeHolder<RoostRecipe>> alcheRecipeOptional = level.getRecipeManager()
                 .getRecipeFor(ModRecipes.ATOMIC_OVEN_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
 
         if (alcheRecipeOptional.isPresent()) {
             if ((getSlotInputItems(3).getItem() == Items.DIRT)) {
-                AtomicOvenRecipe recipe = alcheRecipeOptional.get().value();
+                RoostRecipe recipe = alcheRecipeOptional.get().value();
                 ItemStack result = recipe.getResultItem(level.registryAccess());
 
                 System.out.println("result from goingToBeCrafted: " + result.copy());
@@ -255,10 +257,10 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
         }
     }
 
-    private void spawnResourceArmadillo(AtomicOvenBlockEntity blockEntity) {
+    private void spawnResourceArmadillo(RoostBlockEntity blockEntity) {
         if(!blockEntity.level.isClientSide()) {
             ResourceArmadilloEntity ResourceArmadillo = new ResourceArmadilloEntity(ModEntities.RESOURCE_ARMADILLO.get(), level);
-            float rot = blockEntity.getBlockState().getValue(AtomicOvenBlock.FACING).toYRot();
+            float rot = blockEntity.getBlockState().getValue(RoostBlock.FACING).toYRot();
             Vec3 pos = new Vec3(0.0d, 0.75d, 0.1875d).yRot(-Mth.DEG_TO_RAD * rot).add(blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ() + 0.5);
             ResourceArmadillo.setPos(pos);
             ResourceArmadillo.yBodyRot = Mth.wrapDegrees(rot);
@@ -267,6 +269,9 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
             ItemStack slotStack = blockEntity.getOutputItemInSlot(0);
             ResourceArmadillo.setResource(new ItemStack(slotStack.getItem(), 1));
 
+            if (this.getSlotInputItems(3).getItem() == Items.STONE) {
+                ResourceArmadillo.setBabyAge(-2000);
+            }
 
             blockEntity.level.addFreshEntity(ResourceArmadillo);
         }
@@ -284,9 +289,6 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
         tag.putInt("fuelBurnTime", this.fuelBurnTime);
         tag.put("inputItems", inputItems.serializeNBT(registries));
         tag.put("outputItems", outputItems.serializeNBT(registries));
-        if (!armadilloData) {
-            tag.putBoolean("armadilloData", armadilloData);
-        }
     }
 
     @Override
@@ -297,9 +299,6 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
         this.fuelBurnTime = tag.getInt("fuelBurnTime");
         inputItems.deserializeNBT(registries, tag.getCompound("inputItems"));
         outputItems.deserializeNBT(registries, tag.getCompound("outputItems"));
-        if (tag.contains("armadilloData")) {
-            armadilloData = tag.getBoolean("armadilloData");
-        }
     }
 
     private ItemStackHandler createItemHandler(int slots) {
@@ -371,7 +370,7 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
-        return new AtomicOvenMenu(containerId, player, this.getBlockPos());
+        return new RoostMenu(containerId, player, this.getBlockPos());
     }
 
     @Override
@@ -509,21 +508,26 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
         }
     }
 
-    public void detectAndStoreArmadillo(Level level, BlockPos pos, AtomicOvenBlockEntity blockEntity, BlockState state) {
+    public void detectAndStoreArmadillo(Level level, BlockPos pos, RoostBlockEntity blockEntity, BlockState state) {
         if (level == null || level.isClientSide) return;
 
-        double radius = 2.0;
-        AABB searchArea = new AABB(Vec3.atLowerCornerOf(pos.offset((int) -radius, (int) -radius, (int) -radius)), Vec3.atLowerCornerOf(pos.offset((int) radius, (int) radius, (int) radius)));
+        double radius = 1.95;
+        AABB searchArea = new AABB(
+                Vec3.atLowerCornerOf(pos.offset((int) -radius, (int) -radius, (int) -radius)),
+                Vec3.atLowerCornerOf(pos.offset((int) radius, (int) radius, (int) radius))
+        );
 
         List<Armadillo> armadillos = level.getEntitiesOfClass(Armadillo.class, searchArea);
 
-
-        if (!(getSlotInputItems(3).getItem() == Items.DIRT)) {
+        if (!(getSlotInputItems(3).getItem() == Items.DIRT || getSlotInputItems(3).getItem() == Items.STONE)) {
             if (!armadillos.isEmpty()) {
                 Armadillo armadillo = armadillos.get(0);
-                armadilloData = true;
 
-                setItem(3, Items.DIRT.getDefaultInstance());
+                if (armadillo.isBaby()) {
+                    setItem(3, Items.STONE.getDefaultInstance());
+                } else {
+                    setItem(3, Items.DIRT.getDefaultInstance());
+                }
 
                 armadillo.discard();
 
@@ -532,7 +536,4 @@ public class AtomicOvenBlockEntity extends BlockEntity implements MenuProvider, 
         }
     }
 
-    public static boolean hasArmadillo() {
-        return armadilloData;
-    }
 }

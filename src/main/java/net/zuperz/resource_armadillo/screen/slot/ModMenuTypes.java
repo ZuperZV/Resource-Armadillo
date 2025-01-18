@@ -8,6 +8,7 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.network.IContainerFactory;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
+import net.zuperz.resource_armadillo.screen.ArmadilloHiveMenu;
 import net.zuperz.resource_armadillo.screen.RoostMenu;
 
 import java.util.function.Supplier;
@@ -18,6 +19,9 @@ public class ModMenuTypes {
 
     public static final Supplier<MenuType<RoostMenu>> ATOMIC_OVEN_MENU = MENUS.register("atomic_oven_menu",
             () -> IMenuTypeExtension.create((windowId, inv, data) -> new RoostMenu(windowId, inv.player, data.readBlockPos())));
+
+    public static final Supplier<MenuType<ArmadilloHiveMenu>> ARMADILLO_HIVE_MENU = MENUS.register("armadillo_hive_menu",
+            () -> IMenuTypeExtension.create((windowId, inv, data) -> new ArmadilloHiveMenu(windowId, inv.player, data.readBlockPos())));
 
     private static <T extends AbstractContainerMenu> Supplier<MenuType<T>> registerMenuType(IContainerFactory<T> factory,
                                                                                             String name) {

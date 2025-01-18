@@ -1,35 +1,34 @@
 package net.zuperz.resource_armadillo.screen;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.FurnaceFuelSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.zuperz.resource_armadillo.block.ModBlocks;
-import net.zuperz.resource_armadillo.block.entity.custom.RoostBlockEntity;
-import net.zuperz.resource_armadillo.screen.slot.FluidContainerSlot;
+import net.zuperz.resource_armadillo.block.entity.custom.ArmadilloHiveBlockEntity;
 import net.zuperz.resource_armadillo.screen.slot.ModMenuTypes;
 
-public class RoostMenu extends AbstractContainerMenu {
+public class ArmadilloHiveMenu extends AbstractContainerMenu {
     private final BlockPos pos;
-    public final RoostBlockEntity blockentity;
-    public RoostMenu(int containerId, Player player, BlockPos pos) {
-        super(ModMenuTypes.ATOMIC_OVEN_MENU.get(), containerId);
-        RoostBlockEntity AtomicOvenBlockEntity;
+    public final ArmadilloHiveBlockEntity blockentity;
+    public ArmadilloHiveMenu(int containerId, Player player, BlockPos pos) {
+        super(ModMenuTypes.ARMADILLO_HIVE_MENU.get(), containerId);
+        ArmadilloHiveBlockEntity ArmadilloHiveBlockEntity;
         this.pos = pos;
 
-        if (player.level().getBlockEntity(pos) instanceof RoostBlockEntity blockentity) {
-            AtomicOvenBlockEntity = blockentity;
+        if (player.level().getBlockEntity(pos) instanceof ArmadilloHiveBlockEntity blockentity) {
+            ArmadilloHiveBlockEntity = blockentity;
             this.addDataSlots(blockentity.data);
 
-            addSlot(new SlotItemHandler(blockentity.getInputItems(), 0, 26, 20));
-            addSlot(new SlotItemHandler(blockentity.getInputItems(), 1, 76, 20));
-            addSlot(new SlotItemHandler(blockentity.getInputItems(), 2, 51, 54));
+            addSlot(new SlotItemHandler(blockentity.getInputItems(), 0, 19, 50));
+            addSlot(new SlotItemHandler(blockentity.getInputItems(), 1, 52, 50));
+
+
+            //addSlot(new SlotItemHandler(blockentity.getInputItems(), 2, 51, 54));
 
             /*addSlot(new SlotItemHandler(blockentity.getOutputItems(), 0, 110, 37) {
                 @Override
@@ -39,19 +38,19 @@ public class RoostMenu extends AbstractContainerMenu {
             });*/
 
         } else {
-            AtomicOvenBlockEntity = null;
+            ArmadilloHiveBlockEntity = null;
             System.err.println("Invalid block entity at position: " + pos);
         }
 
         addPlayerInventory(player.getInventory());
         addPlayerHotbar(player.getInventory());
 
-        this.blockentity = AtomicOvenBlockEntity;
+        this.blockentity = ArmadilloHiveBlockEntity;
     }
 
     @Override
     public boolean stillValid(Player player) {
-        return stillValid(ContainerLevelAccess.create(blockentity.getLevel(), blockentity.getBlockPos()), player, ModBlocks.ROOST.get());
+        return stillValid(ContainerLevelAccess.create(blockentity.getLevel(), blockentity.getBlockPos()), player, ModBlocks.ARMADILLO_HIVE.get());
     }
 
     // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
@@ -121,24 +120,6 @@ public class RoostMenu extends AbstractContainerMenu {
 
     }
 
-    public int getScaledFuelBurnTime() {
-        int fuelBurnTime = blockentity.data.get(2);
-        int maxFuelBurnTime = blockentity.getMaxFuelBurnTime();
-        int fuelBarHeight = 14;
-
-        return maxFuelBurnTime != 0 && fuelBurnTime != 0 ? fuelBurnTime * fuelBarHeight / maxFuelBurnTime : 0;
-    }
-
-    public float getLitProgress() {
-        int i = blockentity.data.get(2);
-        int maxFuelBurnTime = blockentity.getMaxFuelBurnTime();
-        if (i == 0) {
-            i = 200;
-        }
-
-        return Mth.clamp((float)blockentity.data.get(2) / (float)i, 0.0F, 1.0F);
-    }
-
     public int getScaledEntityProgress() {
         int progress = blockentity.data.get(0);
         return progress != 0 ? progress * 22 / 22 / 14 : 0;
@@ -148,9 +129,6 @@ public class RoostMenu extends AbstractContainerMenu {
         int progress = blockentity.data.get(0);
         return progress != 0 ? progress * 22 / 22 / 14 /2 : 0;
     }
-
-
-
 
     private void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < 3; ++i) {

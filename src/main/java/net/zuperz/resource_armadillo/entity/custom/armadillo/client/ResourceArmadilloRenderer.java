@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ColorRGBA;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
@@ -39,19 +40,19 @@ public class ResourceArmadilloRenderer extends MobRenderer<ResourceArmadilloEnti
 
         @Override
         public void render(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, ResourceArmadilloEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-            float scale = entity.getAgeScale();
             poseStack.pushPose();
+
+            float scale = entity.getAgeScale();
             if (entity.isBaby()) {
-                poseStack.translate(0.0F, scale, 0.0F);
-                poseStack.scale(scale + 0.0001f, scale, scale + 0.0001f);
             } else {
                 poseStack.scale(scale, scale, scale);
             }
 
+            this.getParentModel().setColor(-1);
 
-            VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityTranslucent(OVERLAY_TEXTURE));
-            this.getParentModel().renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.pack(15, 4), 30.6F, 40.0F, 18.0F, 1.0F);
+            VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(OVERLAY_TEXTURE));
 
+            this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 10, 66, 65);
 
             poseStack.popPose();
         }

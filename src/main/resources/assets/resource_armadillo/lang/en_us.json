@@ -4,5 +4,6 @@
   "item.resource_armadillo.iron_brush": "Iron Brush",
 
 
-  "block.resource_armadillo.roost": "Roost"
+  "block.resource_armadillo.roost": "Roost",
+  "block.resource_armadillo.hive": "Hive"
 }

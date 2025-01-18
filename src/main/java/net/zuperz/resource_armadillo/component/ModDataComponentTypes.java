@@ -17,12 +17,6 @@ public class ModDataComponentTypes {
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES =
             DeferredRegister.createDataComponents(ResourceArmadillo.MOD_ID);
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<ArmadilloHiveBlockEntity.Occupant>>> ARMADILLO = register("armadillo",
-            builder -> builder.persistent(ArmadilloHiveBlockEntity.Occupant.LIST_CODEC)
-                    .networkSynchronized(ArmadilloHiveBlockEntity.Occupant.STREAM_CODEC.apply(ByteBufCodecs.list()))
-                    .cacheEncoding()
-    );
-
     private static <T>DeferredHolder<DataComponentType<?>, DataComponentType<T>> register(String name, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
         return DATA_COMPONENT_TYPES.register(name, () -> builderOperator.apply(DataComponentType.builder()).build());
     }

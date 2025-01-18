@@ -20,6 +20,7 @@ import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceEntity
 import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceSensorTypes;
 import net.zuperz.resource_armadillo.item.ModItems;
 import net.zuperz.resource_armadillo.recipes.ModRecipes;
+import net.zuperz.resource_armadillo.screen.ArmadilloHiveScreen;
 import net.zuperz.resource_armadillo.screen.RoostScreen;
 import net.zuperz.resource_armadillo.screen.slot.ModMenuTypes;
 import org.slf4j.Logger;
@@ -114,6 +115,7 @@ public class ResourceArmadillo
         @SubscribeEvent
         public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(ModMenuTypes.ATOMIC_OVEN_MENU.get(), RoostScreen::new);
+            event.register(ModMenuTypes.ARMADILLO_HIVE_MENU.get(), ArmadilloHiveScreen::new);
         }
     }
 }

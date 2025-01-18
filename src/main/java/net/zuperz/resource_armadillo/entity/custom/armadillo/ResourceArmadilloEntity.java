@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.game.DebugPackets;
@@ -316,18 +317,6 @@ public class ResourceArmadilloEntity extends Animal {
         } else if (scuteCountTime > 0) {
             scuteCountTime--;
         }
-
-        if (this.getHivePos() != null) {
-            BlockPos hivePos = this.getHivePos();
-            double distanceToHive = this.position().distanceTo(Vec3.atCenterOf(hivePos));
-
-            if (distanceToHive <= 2.0) {
-                if (this.level().getBlockEntity(hivePos) instanceof ArmadilloHiveBlockEntity armadilloHive) {
-                    armadilloHive.addOccupant(this);
-                }
-            }
-        }
-
     }
 
     @Override
@@ -490,13 +479,13 @@ public class ResourceArmadilloEntity extends Animal {
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         } else if (!itemstack.isEmpty() && !itemstack.is(ItemTags.ARMADILLO_FOOD) && !(itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH))) {
             setResource(itemstack);
-            //System.out.println("Item used in setResource: " + itemstack.getDisplayName().getString());
-            //System.out.println("scuteCount: " + scuteCount);
+            pPlayer.sendSystemMessage(Component.literal("Item used in setResource: " + itemstack.getDisplayName().getString()));
+            pPlayer.sendSystemMessage(Component.literal("scuteCount: " + scuteCount));
         } else if (itemstack.isEmpty() && !(itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH))) {
-            //System.out.println("resource is: " + getResource().getDisplayName().getString());
-            //System.out.println("scuteCount is: " + scuteCount);
-            //System.out.println("scuteCountTime is: " + scuteCountTime);
-            //System.out.println("scuteTime is: " + scuteTime);
+            pPlayer.sendSystemMessage(Component.literal("resource is: " + getResource().getDisplayName().getString()));
+            pPlayer.sendSystemMessage(Component.literal("scuteCount is: " + scuteCount));
+            pPlayer.sendSystemMessage(Component.literal("scuteCountTime is: " + scuteCountTime));
+            pPlayer.sendSystemMessage(Component.literal("scuteTime is: " + scuteTime));
         }
         return this.isScared() ? InteractionResult.FAIL : super.mobInteract(pPlayer, pHand);
     }

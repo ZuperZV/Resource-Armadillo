@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -14,6 +15,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -64,6 +66,8 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
 
     private int fuelBurnTime = 0;
     private int maxFuelBurnTime = 1000;
+
+    private String storedArmadilloData = "";
 
     public final ContainerData data;
 
@@ -258,22 +262,68 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
     }
 
     private void spawnResourceArmadillo(RoostBlockEntity blockEntity) {
-        if(!blockEntity.level.isClientSide()) {
-            ResourceArmadilloEntity ResourceArmadillo = new ResourceArmadilloEntity(ModEntities.RESOURCE_ARMADILLO.get(), level);
-            float rot = blockEntity.getBlockState().getValue(RoostBlock.FACING).toYRot();
-            Vec3 pos = new Vec3(0.0d, 0.75d, 0.1875d).yRot(-Mth.DEG_TO_RAD * rot).add(blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ() + 0.5);
-            ResourceArmadillo.setPos(pos);
-            ResourceArmadillo.yBodyRot = Mth.wrapDegrees(rot);
-            ResourceArmadillo.yHeadRot = Mth.wrapDegrees(rot);
+        if (!blockEntity.level.isClientSide()) {
+            ResourceArmadilloEntity resourceArmadillo = new ResourceArmadilloEntity(ModEntities.RESOURCE_ARMADILLO.get(), blockEntity.level);
 
-            ItemStack slotStack = blockEntity.getOutputItemInSlot(0);
-            ResourceArmadillo.setResource(new ItemStack(slotStack.getItem(), 1));
-
-            if (this.getSlotInputItems(3).getItem() == Items.STONE) {
-                ResourceArmadillo.setBabyAge(-2000);
+            String storedData = blockEntity.getStoredArmadilloData();
+            if (!storedData.isEmpty()) {
+                try {
+                    CompoundTag armadilloData = TagParser.parseTag(storedData);
+                    resourceArmadillo.load(armadilloData);
+                } catch (Exception e) {
+                    System.err.println("Failed to parse or load armadillo data: " + e.getMessage());
+                }
             }
 
-            blockEntity.level.addFreshEntity(ResourceArmadillo);
+            float rot = blockEntity.getBlockState().getValue(RoostBlock.FACING).toYRot();
+            Vec3 pos = new Vec3(0.0d, 0.75d, 0.1875d)
+                    .yRot(-Mth.DEG_TO_RAD * rot)
+                    .add(blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ() + 0.5);
+            resourceArmadillo.setPos(pos);
+            resourceArmadillo.yBodyRot = Mth.wrapDegrees(rot);
+            resourceArmadillo.yHeadRot = Mth.wrapDegrees(rot);
+
+            ItemStack slotStack = blockEntity.getOutputItemInSlot(0);
+            if (!slotStack.isEmpty()) {
+                resourceArmadillo.setResource(new ItemStack(slotStack.getItem(), 1));
+            }
+
+            if (blockEntity.getSlotInputItems(3).getItem() == Items.STONE) {
+                resourceArmadillo.setBabyAge(-2000);
+            }
+
+            blockEntity.level.addFreshEntity(resourceArmadillo);
+        }
+    }
+
+    public void spawnResourceArmadilloFromData(RoostBlockEntity blockEntity) {
+        if (!blockEntity.level.isClientSide() && !blockEntity.getStoredArmadilloData().isEmpty()) {
+            try {
+                CompoundTag armadilloData = TagParser.parseTag(blockEntity.getStoredArmadilloData());
+
+                ResourceArmadilloEntity resourceArmadillo = new ResourceArmadilloEntity(EntityType.ARMADILLO, blockEntity.level);
+
+                resourceArmadillo.load(armadilloData);
+
+                float rot = blockEntity.getBlockState().getValue(RoostBlock.FACING).toYRot();
+                Vec3 pos = new Vec3(0.0d, 0.75d, 0.1875d)
+                        .yRot(-Mth.DEG_TO_RAD * rot)
+                        .add(blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ() + 0.5);
+
+                resourceArmadillo.setPos(pos);
+                resourceArmadillo.yBodyRot = Mth.wrapDegrees(rot);
+                resourceArmadillo.yHeadRot = Mth.wrapDegrees(rot);
+
+                ItemStack slotStack = blockEntity.getOutputItemInSlot(0);
+                resourceArmadillo.setResource(new ItemStack(slotStack.getItem(), 1));
+
+                blockEntity.level.addFreshEntity(resourceArmadillo);
+
+                System.out.println("Text");
+
+            } catch (Exception e) {
+                System.err.println("Failed to spawn ResourceArmadillo from stored data: " + e.getMessage());
+            }
         }
     }
 
@@ -375,16 +425,27 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("block.resource_armadillo.atomic_oven");
+        return Component.translatable("block.resource_armadillo.roost");
     }
 
     public void dropItems() {
-        SimpleContainer inventory = new SimpleContainer(itemHandler.get().getSlots());
+        SimpleContainer inventory = new SimpleContainer(itemHandler.get().getSlots() - 1);
+
+        int targetSlot = 0;
         for (int i = 0; i < itemHandler.get().getSlots(); i++) {
-            inventory.setItem(i, itemHandler.get().getStackInSlot(i));
+            if (i == 4) {
+                continue;
+            }
+
+            inventory.setItem(targetSlot, itemHandler.get().getStackInSlot(i));
+            targetSlot++;
         }
+
         Containers.dropContents(level, worldPosition, inventory);
     }
+
+
+
 
     @Override
     public int[] getSlotsForFace(Direction p_58363_) {
@@ -508,6 +569,15 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
         }
     }
 
+    public void setStoredArmadilloData(String data) {
+        this.storedArmadilloData = data;
+        setChanged();
+    }
+
+    public String getStoredArmadilloData() {
+        return this.storedArmadilloData;
+    }
+
     public void detectAndStoreArmadillo(Level level, BlockPos pos, RoostBlockEntity blockEntity, BlockState state) {
         if (level == null || level.isClientSide) return;
 
@@ -529,11 +599,15 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
                     setItem(3, Items.DIRT.getDefaultInstance());
                 }
 
+                CompoundTag armadilloData = new CompoundTag();
+                armadillo.save(armadilloData);
+
+                blockEntity.setStoredArmadilloData(armadilloData.toString());
+
                 armadillo.discard();
 
                 blockEntity.setChanged();
             }
         }
     }
-
 }

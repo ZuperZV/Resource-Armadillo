@@ -11,13 +11,14 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
 
 @OnlyIn(Dist.CLIENT)
-public class ResourceArmadilloModel extends AgeableHierarchicalModel<ResourceArmadilloEntity> {
+public class ResourceArmadilloModel extends ColorableAgeableHierarchicalModel<ResourceArmadilloEntity> {
     private static final float BABY_Y_OFFSET = 16.02F;
     private static final float MAX_DOWN_HEAD_ROTATION_EXTENT = 25.0F;
     private static final float MAX_UP_HEAD_ROTATION_EXTENT = 22.5F;
@@ -140,8 +141,16 @@ public class ResourceArmadilloModel extends AgeableHierarchicalModel<ResourceArm
         this.animate(pEntity.peekAnimationState, ArmadilloAnimation.ARMADILLO_PEEK, pAgeInTicks, 1.0F);
     }
 
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        this.body.render(poseStack, vertexConsumer, packedLight, packedOverlay);
-        this.cube.render(poseStack, vertexConsumer, packedLight, packedOverlay);
+    @Override
+    public void renderToBuffer(PoseStack p_273029_, VertexConsumer p_272763_, int p_273665_, int p_272602_, int p_350346_) {
+        if (this.young) {
+            p_273029_.pushPose();
+            p_273029_.scale(this.getYoungScaleFactor(), this.getYoungScaleFactor(), this.getYoungScaleFactor());
+            p_273029_.translate(0.0F, this.getBodyYOffset() / 16.0F, 0.0F);
+            this.root().render(p_273029_, p_272763_, p_273665_, p_272602_, p_350346_);
+            p_273029_.popPose();
+        } else {
+            this.root().render(p_273029_, p_272763_, p_273665_, p_272602_, p_350346_);
+        }
     }
 }

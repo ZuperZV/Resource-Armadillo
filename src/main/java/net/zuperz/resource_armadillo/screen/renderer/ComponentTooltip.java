@@ -12,23 +12,28 @@ import java.util.List;
  *  https://github.com/BluSunrize/ImmersiveEngineering/blob/1.19.2/LICENSE
  *
  *  Slightly Modified Version by: Kaupenjoe
+ *  Slightly Modified Version by: ZuperZ
  */
-public class Tooltip {
+public class ComponentTooltip {
     private final int xPos;
     private final int yPos;
     private final int width;
     private final int height;
-    private final String name;
+    private final Component name;
+    private final Component name2;
+    private final Component name3;
 
-    public Tooltip(int xMin, int yMin, String name, int width, int height)  {
-        xPos = xMin;
-        yPos = yMin;
+    public ComponentTooltip(int xMin, int yMin, Component name, Component name2, Component name3, int width, int height)  {
+        this.xPos = xMin;
+        this.yPos = yMin;
         this.width = width;
         this.height = height;
         this.name = name;
+        this.name2 = name2;
+        this.name3 = name3;
     }
 
-    public List<Component> getTooltips() {
-        return List.of(Component.literal(name));
+    public List<Component> getComponentTooltips() {
+        return List.of(name, name2, name3);
     }
 }

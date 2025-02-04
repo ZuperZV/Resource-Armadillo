@@ -1,5 +1,6 @@
 package net.zuperz.resource_armadillo.recipes;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
@@ -17,9 +18,9 @@ public class ResourceArmadilloEntityRecipe implements Recipe<RecipeInput> {
     public final ItemStack output;
     public final Ingredient resource;
     public final Ingredient scuteResource;
-    public final Ingredient overlayTexture;
+    public final String overlayTexture;
 
-    public ResourceArmadilloEntityRecipe(ItemStack output, Ingredient resource, Ingredient scuteResource, Ingredient overlayTexture) {
+    public ResourceArmadilloEntityRecipe(ItemStack output, Ingredient resource, Ingredient scuteResource, String overlayTexture) {
         this.output = output;
         this.resource = resource;
         this.scuteResource = scuteResource;
@@ -38,6 +39,10 @@ public class ResourceArmadilloEntityRecipe implements Recipe<RecipeInput> {
         return scuteResource;
     }
 
+    public String getOverlayTexture() {
+        return overlayTexture;
+    }
+
     @Override
     public ItemStack getResultItem(HolderLookup.Provider registries) {
         return output.copy();
@@ -50,7 +55,7 @@ public class ResourceArmadilloEntityRecipe implements Recipe<RecipeInput> {
         if(pLevel.isClientSide()) {
             return false;
         }
-        return resource.test(pContainer.getItem(0)) && scuteResource.test(pContainer.getItem(1)) && overlayTexture.test(pContainer.getItem(2));
+        return resource.test(pContainer.getItem(0));
     }
     @Override
     public boolean isSpecial() {
@@ -58,10 +63,8 @@ public class ResourceArmadilloEntityRecipe implements Recipe<RecipeInput> {
     }
     @Override
     public NonNullList<Ingredient> getIngredients() {
-        NonNullList<Ingredient> ingredients = NonNullList.createWithCapacity(3);
+        NonNullList<Ingredient> ingredients = NonNullList.createWithCapacity(1);
         ingredients.add(0, resource);
-        ingredients.add(1, scuteResource);
-        ingredients.add(2, overlayTexture);
         return ingredients;
     }
     @Override
@@ -95,16 +98,22 @@ public class ResourceArmadilloEntityRecipe implements Recipe<RecipeInput> {
                 ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "resource_armadillo");
 
         private final MapCodec<ResourceArmadilloEntityRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> {
-            return instance.group(CodecFix.ITEM_STACK_CODEC.fieldOf("output").forGetter((recipe) -> {
-                return recipe.output;
-            }), Ingredient.CODEC_NONEMPTY.fieldOf("resource").forGetter((recipe) -> {
-                return recipe.resource;
-            }), Ingredient.CODEC_NONEMPTY.fieldOf("scuteResource").forGetter((recipe) -> {
-                return recipe.scuteResource;
-            }), Ingredient.CODEC_NONEMPTY.fieldOf("overlay_Texture").forGetter((recipe) -> {
-                return recipe.overlayTexture;
-            })).apply(instance, ResourceArmadilloEntityRecipe::new);
+            return instance.group(
+                    CodecFix.ITEM_STACK_CODEC.fieldOf("output").forGetter((recipe) -> {
+                        return recipe.output;
+                    }),
+                    Ingredient.CODEC_NONEMPTY.fieldOf("resource").forGetter((recipe) -> {
+                        return recipe.resource;
+                    }),
+                    Ingredient.CODEC_NONEMPTY.fieldOf("scuteResource").forGetter((recipe) -> {
+                        return recipe.scuteResource;
+                    }),
+                    Codec.STRING.fieldOf("overlayTexture").forGetter((recipe) -> {
+                        return recipe.overlayTexture;
+                    })
+            ).apply(instance, ResourceArmadilloEntityRecipe::new);
         });
+
 
         private final StreamCodec<RegistryFriendlyByteBuf, ResourceArmadilloEntityRecipe> STREAM_CODEC = StreamCodec.of(
                 Serializer::write, Serializer::read);
@@ -119,19 +128,19 @@ public class ResourceArmadilloEntityRecipe implements Recipe<RecipeInput> {
             return STREAM_CODEC;
         }
 
-        private static ResourceArmadilloEntityRecipe read(RegistryFriendlyByteBuf  buffer) {
+        private static ResourceArmadilloEntityRecipe read(RegistryFriendlyByteBuf buffer) {
             Ingredient input0 = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
             Ingredient input1 = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
-            Ingredient input2 = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
+            String overlayTexture = buffer.readUtf();
             ItemStack output = ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer);
 
-            return new ResourceArmadilloEntityRecipe(output, input0, input1, input2);
+            return new ResourceArmadilloEntityRecipe(output, input0, input1, overlayTexture);
         }
 
-        private static void write(RegistryFriendlyByteBuf  buffer, ResourceArmadilloEntityRecipe recipe) {
+        private static void write(RegistryFriendlyByteBuf buffer, ResourceArmadilloEntityRecipe recipe) {
             Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.resource);
             Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.scuteResource);
-            Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.overlayTexture);
+            buffer.writeUtf(recipe.getOverlayTexture());
             ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, recipe.output);
         }
     }

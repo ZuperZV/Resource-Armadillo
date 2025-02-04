@@ -1,14 +1,9 @@
 package net.zuperz.resource_armadillo.entity.custom.armadillo;
 
-import com.google.common.collect.Lists;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 
-import java.awt.*;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntFunction;
@@ -34,30 +29,29 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.util.*;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.Bee;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.pathfinder.Path;
-import net.minecraft.world.phys.Vec3;
-import net.zuperz.resource_armadillo.block.entity.custom.ArmadilloHiveBlockEntity;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ai.ResourceArmadilloAi;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceEntityDataSerializers;
 import net.zuperz.resource_armadillo.recipes.ResourceArmadilloEntityRecipe;
+import net.zuperz.resource_armadillo.recipes.ModRecipes;
 
 public class ResourceArmadilloEntity extends Animal {
     public static final float BABY_SCALE = 0.6F;
@@ -70,7 +64,7 @@ public class ResourceArmadilloEntity extends Animal {
     Random pRandom = new Random();
 
     private double productionSpeed = (generateProductionSpeed(pRandom::nextDouble));
-    private ItemStack resource = Items.ARMADILLO_SCUTE.getDefaultInstance();
+    public ItemStack resource = Items.ARMADILLO_SCUTE.getDefaultInstance();
     private double productionEfficiency = (generateproductionEfficiency(pRandom::nextDouble));
 
     private static final EntityDataAccessor<ArmadilloState> ARMADILLO_STATE = SynchedEntityData.defineId(
@@ -84,6 +78,7 @@ public class ResourceArmadilloEntity extends Animal {
     private int scuteCount;
     private int scuteTime;
     private int scuteCountTime = 0;
+    public ResourceLocation overlayTexture;
     BlockPos hivePos;
 
     private boolean peekReceivedClient = false;
@@ -102,6 +97,115 @@ public class ResourceArmadilloEntity extends Animal {
 
     public void setResource(ItemStack resource) {
         this.resource = resource;
+    }
+
+    public void setOverlayTexture(ResourceLocation texture) {
+        this.overlayTexture = texture;
+    }
+
+    public ResourceLocation craftItem() {
+        System.out.println("craftItem() blev kaldt!");
+        Level level = this.level();
+
+        SimpleContainer recipeInputContainer = new SimpleContainer(1);
+        recipeInputContainer.setItem(0, resource);
+
+        Optional<RecipeHolder<ResourceArmadilloEntityRecipe>> recipeHolder = level.getRecipeManager()
+                .getRecipeFor(ModRecipes.RESOURCE_ARMADILLO_RECIPE_TYPE.get(), getRecipeInput(recipeInputContainer), level);
+
+        if (recipeHolder.isPresent()) {
+            System.out.println("craftItem recipeHolder.isPresent(): " + recipeHolder.isPresent());
+            ResourceArmadilloEntityRecipe recipe = recipeHolder.get().value();
+            String result = recipe.getOverlayTexture();
+            System.out.println("getOverlayTexture: " + recipe.getOverlayTexture());
+
+            if (result.isEmpty()) {
+                System.out.println("result.isEmpty: " + result.isEmpty());
+                System.err.println("Opskriften returnerede et tomt resultat.");
+                return null;
+            }
+
+            String[] parts = result.toString().split(":", 2); //"minecraft:textures/entity/armadillo.png"
+            String namespace = parts[0];
+            String path = parts[1];
+
+            ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(namespace, path);
+            System.out.println("resourceLocation: " + resourceLocation);
+            setOverlayTexture(resourceLocation);
+            return resourceLocation;
+
+        } else {
+        }
+        return null;
+    }
+
+    public ResourceLocation craftItemAndHasRecipe() {
+        if (hasRecipe()) {
+            return(craftItem());
+        }
+        return null;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (this.level().isClientSide()) {
+            this.setupAnimationStates();
+        }
+
+        if (this.isScared()) {
+            this.clampHeadRotationToBody();
+        }
+
+        this.inStateTicks++;
+        --scuteTime;
+
+        if (scuteCountTime <= 0 && scuteCount <= 0) {
+            pickNextScuteCount();
+            pickNextScuteCountTime();
+        } else if (scuteCountTime > 0) {
+            scuteCountTime--;
+        }
+    }
+
+    private boolean hasRecipe() {
+        Level level = this.level();
+        if (level == null) return false;
+
+        SimpleContainer recipeInputContainer = new SimpleContainer(1);
+        recipeInputContainer.setItem(0, resource.copy());
+
+        Optional<RecipeHolder<ResourceArmadilloEntityRecipe>> recipeHolder = level.getRecipeManager()
+                .getRecipeFor(ModRecipes.RESOURCE_ARMADILLO_RECIPE_TYPE.get(), getRecipeInput(recipeInputContainer), level);
+
+        if (recipeHolder.isPresent()) {
+            ResourceArmadilloEntityRecipe recipe = recipeHolder.get().value();
+
+            boolean ingredientMatches = recipe.resource.test(resource);
+            System.out.println("Ingredient matches: " + ingredientMatches);
+
+            return ingredientMatches;
+        } else {
+        }
+
+        return false;
+    }
+
+
+
+    private RecipeInput getRecipeInput(SimpleContainer inventory) {
+        return new RecipeInput() {
+            @Override
+            public ItemStack getItem(int index) {
+                return inventory.getItem(index).copy();
+            }
+
+            @Override
+            public int size() {
+                return inventory.getContainerSize();
+            }
+        };
     }
 
     protected static double generateProductionSpeed(DoubleSupplier pSupplier) {
@@ -295,28 +399,6 @@ public class ResourceArmadilloEntity extends Animal {
 
     private void pickNextScuteCountTime() {
         this.scuteCountTime = this.random.nextInt(3400, 10000);
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        if (this.level().isClientSide()) {
-            this.setupAnimationStates();
-        }
-
-        if (this.isScared()) {
-            this.clampHeadRotationToBody();
-        }
-
-        this.inStateTicks++;
-        --scuteTime;
-
-        if (scuteCountTime <= 0 && scuteCount <= 0) {
-            pickNextScuteCount();
-            pickNextScuteCountTime();
-        } else if (scuteCountTime > 0) {
-            scuteCountTime--;
-        }
     }
 
     @Override

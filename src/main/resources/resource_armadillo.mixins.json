@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "net.zuperz.resource_armadillo.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "TestMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

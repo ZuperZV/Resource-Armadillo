@@ -193,6 +193,7 @@ public class ArmadilloHiveBlock extends Block implements EntityBlock {
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (state.getBlock() != newState.getBlock()) {
             if (level.getBlockEntity(pos) instanceof ArmadilloHiveBlockEntity furnace) {
+                furnace.spawnResourceArmadilloFromData(furnace, "0", 3);
                 furnace.setItem(3, ItemStack.EMPTY);
                 furnace.setItem(2, ItemStack.EMPTY);
                 furnace.dropItems();

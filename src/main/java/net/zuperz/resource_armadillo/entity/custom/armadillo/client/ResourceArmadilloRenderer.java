@@ -12,14 +12,25 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ColorRGBA;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
+import net.zuperz.resource_armadillo.recipes.ModRecipes;
+import net.zuperz.resource_armadillo.recipes.ResourceArmadilloEntityRecipe;
+
+import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
 public class ResourceArmadilloRenderer extends MobRenderer<ResourceArmadilloEntity, ResourceArmadilloModel> {
-    private static final ResourceLocation ARMADILLO_LOCATION = ResourceLocation.withDefaultNamespace("textures/entity/armadillo.png");
+    public static final ResourceLocation ARMADILLO_LOCATION = ResourceLocation.withDefaultNamespace("textures/entity/armadillo.png");
+    public static final ResourceLocation WHiTE_OVERLAY_TEXTURE = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "textures/entity/white_armadillo.png");
 
     public ResourceArmadilloRenderer(EntityRendererProvider.Context context) {
         super(context, new ResourceArmadilloModel(context.bakeLayer(ModModelLayers.RESOURCE_ARMADILLO)), 0.4F);
@@ -28,11 +39,16 @@ public class ResourceArmadilloRenderer extends MobRenderer<ResourceArmadilloEnti
 
     @Override
     public ResourceLocation getTextureLocation(ResourceArmadilloEntity entity) {
-        return ARMADILLO_LOCATION;
+        if(entity.resource == Items.DIAMOND.getDefaultInstance()) {
+            System.out.println("Text: " + WHiTE_OVERLAY_TEXTURE);
+            return WHiTE_OVERLAY_TEXTURE;
+        } else {
+            return ARMADILLO_LOCATION;
+        }
     }
 
     public class ArmadilloOverlayLayer extends RenderLayer<ResourceArmadilloEntity, ResourceArmadilloModel> {
-        private static final ResourceLocation OVERLAY_TEXTURE = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "textures/entity/armadillo_part_1.png");
+        public static final ResourceLocation OVERLAY_TEXTURE = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "textures/entity/armadillo_part_1.png");
 
         public ArmadilloOverlayLayer(RenderLayerParent<ResourceArmadilloEntity, ResourceArmadilloModel> parent) {
             super(parent);
@@ -50,7 +66,13 @@ public class ResourceArmadilloRenderer extends MobRenderer<ResourceArmadilloEnti
 
             this.getParentModel().setColor(-1);
 
-            VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(OVERLAY_TEXTURE));
+            VertexConsumer vertexConsumer;
+
+            if (!(entity.craftItemAndHasRecipe() == null)) {
+                vertexConsumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(entity.craftItemAndHasRecipe()));
+            } else {
+                vertexConsumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(OVERLAY_TEXTURE));
+            }
 
             this.getParentModel().renderToBuffer(poseStack, vertexConsumer, 10, 66, 65);
 

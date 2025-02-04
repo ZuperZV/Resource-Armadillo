@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "resource_armadillo:item/armadillo_tab",
+    "layer1": "resource_armadillo:item/armadillo_tab_overlay"
+  }
+}

@@ -1,9 +1,22 @@
 {
-  "item.minecarft.brush": "Copper Brush",
+  "creativetab.resource_armadillo.resource_armadillo_tab": "Resource Armadillo",
 
+  "item.minecraft.brush": "Copper Brush",
   "item.resource_armadillo.iron_brush": "Iron Brush",
 
+  "item.resource_armadillo.diamond_armadillo_scute": "Diamond Armadillo Scute",
+  "item.resource_armadillo.resource_armadillo_spawn_egg": "Resource Armadillo Spawn Egg",
+  "item.resource_armadillo.armadillo_part": "Armadillo Part",
+
+  "armadillo_scute.resource_armadillo.emerald": "Emerald",
+  "armadillo_scute.resource_armadillo.diamond": "Diamond",
+  "armadillo_scute.resource_armadillo.stone": "Stone",
 
   "block.resource_armadillo.roost": "Roost",
-  "block.resource_armadillo.hive": "Hive"
+  "block.resource_armadillo.armadillo_hive": "Armadillo Hive",
+
+  "tool_tip.resource_armadillo.left_click": "§8Left-click to send ",
+  "tool_tip.resource_armadillo.out_of_the_roost": " §8out of the Roost!",
+  "tool_tip.resource_armadillo.hive_output": "§8This is the Output",
+  "item.resource_armadillo.resource_armadillo_scute": "Armadillo Scute"
 }

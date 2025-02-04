@@ -1,16 +1,13 @@
 package net.zuperz.resource_armadillo;
 
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.zuperz.resource_armadillo.block.ModBlocks;
 import net.zuperz.resource_armadillo.block.entity.ModBlockEntities;
-import net.zuperz.resource_armadillo.block.entity.custom.ArmadilloHiveBlockEntity;
-import net.zuperz.resource_armadillo.component.ModDataComponentTypes;
+import net.zuperz.resource_armadillo.block.entity.renderer.RoostBlockEntityRenderer;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ModEntities;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.client.ModModelLayers;
@@ -18,25 +15,37 @@ import net.zuperz.resource_armadillo.entity.custom.armadillo.client.ResourceArma
 import net.zuperz.resource_armadillo.entity.custom.armadillo.client.ResourceArmadilloRenderer;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceEntityDataSerializers;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceSensorTypes;
+import net.zuperz.resource_armadillo.item.ModArmadilloScutes;
+import net.zuperz.resource_armadillo.item.ModCreativeModeTabs;
 import net.zuperz.resource_armadillo.item.ModItems;
+import net.zuperz.resource_armadillo.item.custom.RainbowItem;
+import net.zuperz.resource_armadillo.item.custom.component.ModDataComponentTypes;
 import net.zuperz.resource_armadillo.recipes.ModRecipes;
 import net.zuperz.resource_armadillo.screen.ArmadilloHiveScreen;
 import net.zuperz.resource_armadillo.screen.RoostScreen;
 import net.zuperz.resource_armadillo.screen.slot.ModMenuTypes;
-import org.slf4j.Logger;
-
-import com.mojang.logging.LogUtils;
-
+import net.zuperz.resource_armadillo.util.ArmadilloScuteRegistry;
+import net.zuperz.resource_armadillo.util.ArmadilloScuteType;
+import org.slf4j.Logger;import com.mojang.logging.LogUtils;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.IPayloadHandler;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.fml.common.Mod;
+
+import java.util.HashMap;
+import java.util.Map;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(ResourceArmadillo.MOD_ID)
@@ -47,8 +56,8 @@ public class ResourceArmadillo
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static void sendArmadilloHiveInfo(Level p_179511_, BlockPos p_179512_, BlockState p_179513_, ArmadilloHiveBlockEntity p_179514_) {
-    }
+    private static boolean networkingRegistered = false;
+    private static final Map<CustomPacketPayload.Type<?>, NetworkMessage<?>> MESSAGES = new HashMap<>();
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
@@ -56,9 +65,16 @@ public class ResourceArmadillo
     {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::registerNetworking);
+
+        ArmadilloScuteRegistry registry = ArmadilloScuteRegistry.getInstance();
+        ModArmadilloScutes.registerAll(registry);
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+
+        ModCreativeModeTabs.register(modEventBus);
+        ModDataComponentTypes.register(modEventBus);
 
         ModMenuTypes.register(modEventBus);
         ModBlockEntities.register(modEventBus);
@@ -67,11 +83,9 @@ public class ResourceArmadillo
         ModRecipes.RECIPE_TYPES.register(modEventBus);
 
         ModEntities.register(modEventBus);
-        ModDataComponentTypes.register(modEventBus);
 
         ResourceEntityDataSerializers.register(modEventBus);
         ResourceSensorTypes.register(modEventBus);
-
 
         NeoForge.EVENT_BUS.register(this);
     }
@@ -107,15 +121,46 @@ public class ResourceArmadillo
             event.put(ModEntities.RESOURCE_ARMADILLO.get(), ResourceArmadilloEntity.createAttributes().build());
         }
 
-        /*@SubscribeEvent
+        @SubscribeEvent
         public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerBlockEntityRenderer(ModBlockEntities.ROOST_BLOCK_ENTITY.get(), RoostBlockEntityRenderer::new);
         }
-         */
 
         @SubscribeEvent
         public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(ModMenuTypes.ATOMIC_OVEN_MENU.get(), RoostScreen::new);
             event.register(ModMenuTypes.ARMADILLO_HIVE_MENU.get(), ArmadilloHiveScreen::new);
         }
+
+        @SubscribeEvent
+        public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
+            event.register((stack, layer) -> {
+                if (layer == 1) {
+                    return RainbowItem.getRainbowColor();
+                }
+                return -1;
+            }, ModItems.ARMADILLO_TAB.get());
+        }
+    }
+
+    private static record NetworkMessage<T extends CustomPacketPayload>(
+            StreamCodec<? extends FriendlyByteBuf, T> reader,
+            IPayloadHandler<T> handler) {
+    }
+
+    public static <T extends CustomPacketPayload> void addNetworkMessage(CustomPacketPayload.Type<T> id,
+                                                                         StreamCodec<? extends FriendlyByteBuf, T> reader,
+                                                                         IPayloadHandler<T> handler) {
+        if (networkingRegistered) {
+            throw new IllegalStateException("Cannot register new network messages after networking has been registered");
+        }
+        MESSAGES.put(id, new NetworkMessage<>(reader, handler));
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void registerNetworking(final RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar(MOD_ID);
+        MESSAGES.forEach((id, networkMessage) -> registrar.playBidirectional(id, ((NetworkMessage) networkMessage).reader(), ((NetworkMessage) networkMessage).handler()));
+        networkingRegistered = true;
     }
 }

@@ -39,25 +39,35 @@ public class RoostBlock extends Block implements EntityBlock {
     public static BooleanProperty ARMADILLO_DATA = BooleanProperty.create("armadillo_data");
 
     private static final VoxelShape SHAPE_NORTH = Shapes.or(
-            box(0.875, 4, 0.625, 15.375, 6, 15.125),
+            // First element
+            box(0.75, 4, 0.75, 15.25, 6, 15.25),
 
-            box(2.125, 6, 1.375, 14.125, 8, 13.875),
+            // Second element
+            box(2.0, 6, 1.5, 14.0, 8, 14.0),
 
-            box(13.875, 6, 1.875, 14.875, 13, 13.875),
+            // Third element
+            box(13.75, 6, 2.0, 14.75, 13, 14.0),
 
-            box(1.375, 6, 2.125, 2.375, 13, 14.125),
+            // Fourth element
+            box(1.25, 6, 2.25, 2.25, 13, 14.25),
 
-            box(1.875, 6, 13.625, 13.875, 14, 14.625),
+            // Fifth element
+            box(1.75, 6, 13.75, 13.75, 14, 14.75),
 
-            box(1.125, 6, 0.875, 3.125, 15, 2.875),
+            // Sixth element
+            box(1.0, 6, 1.0, 3.0, 15, 3.0),
 
-            box(13.125, 6, 12.875, 15.125, 15, 14.875),
+            // Seventh element
+            box(13.0, 6, 13.0, 15.0, 15, 15.0),
 
-            box(1.125, 6, 13.125, 3.125, 15, 15.125),
+            // Eighth element
+            box(1.0, 6, 13.25, 3.0, 15, 15.25),
 
-            box(13.125, 6, 0.875, 15.125, 15, 2.875),
+            // Ninth element
+            box(13.0, 6, 1.0, 15.0, 15, 3.0),
 
-            box(0.125, 0, -0.125, 16.125, 4, 15.875)
+            // Tenth element (the base)
+            box(0.0, 0, 0.0, 16.0, 4, 16.0)
     );
 
     private static final VoxelShape SHAPE_EAST = rotateShape(Direction.NORTH, Direction.EAST, SHAPE_NORTH);
@@ -165,6 +175,7 @@ public class RoostBlock extends Block implements EntityBlock {
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (state.getBlock() != newState.getBlock()) {
             if (level.getBlockEntity(pos) instanceof RoostBlockEntity furnace) {
+                furnace.spawnResourceArmadilloFromData(furnace, "0");
                 furnace.setItem(3, ItemStack.EMPTY);
                 furnace.dropItems();
             }

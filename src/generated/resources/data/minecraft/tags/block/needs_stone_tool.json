@@ -1,5 +1,7 @@
 {
   "values": [
+    "resource_armadillo:roost",
+    "resource_armadillo:armadillo_hive",
     "resource_armadillo:armadillo_hive"
   ]
 }

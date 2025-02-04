@@ -1,6 +1,7 @@
 package net.zuperz.resource_armadillo.block.entity.custom;
 
 import com.google.common.collect.Lists;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -14,6 +15,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -21,11 +23,13 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.network.protocol.game.DebugPackets;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.VisibleForDebug;
 import net.minecraft.world.Containers;
@@ -34,6 +38,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -64,12 +69,16 @@ import net.zuperz.resource_armadillo.block.entity.ItemHandler.CustomItemHandler;
 import net.zuperz.resource_armadillo.block.entity.ModBlockEntities;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ModEntities;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
+import net.zuperz.resource_armadillo.recipes.BreedingRecipe;
 import net.zuperz.resource_armadillo.recipes.ModRecipes;
-import net.zuperz.resource_armadillo.recipes.RoostRecipe;
+import net.zuperz.resource_armadillo.recipes.BreedingRecipe;
 import net.zuperz.resource_armadillo.screen.ArmadilloHiveMenu;
+import net.zuperz.resource_armadillo.screen.RoostMenu;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
+import static net.zuperz.resource_armadillo.block.custom.ArmadilloHiveBlock.ARMADILLO_DATA;
 
 public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvider, WorldlyContainer {
 
@@ -80,12 +89,23 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
     private final Lazy<IItemHandler> inputItemHandler = Lazy.of(() -> new CustomItemHandler(inputItems));
     private final Lazy<IItemHandler> outputItemHandler = Lazy.of(() -> new CustomItemHandler(outputItems));
 
-    private static final int[] SLOTS_FOR_UP = new int[]{0, 1, 2, 3};
-    private static final int[] SLOTS_FOR_DOWN = new int[]{4};
-    private static final int[] SLOTS_FOR_SIDES = new int[]{0, 1, 2, 3};
+
+    private static final int[] SLOTS_FOR_UP = new int[]{0, 1};
+    private static final int[] SLOTS_FOR_DOWN = new int[]{0, 1};
+    private static final int[] SLOTS_FOR_SIDES = new int[]{0, 1};
 
     private int progress = 0;
-    private int maxProgress = 300;
+    private int maxProgress = 3000;
+
+    private long lastArmadilloExitTime = 0;
+    private static final long ARMADILLO_COOLDOWN_TIME = 5000;
+
+    private String storedArmadilloData = "";
+
+    private String storedArmadilloData2 = "";
+
+    private String sameArmadilloItem ="";
+    public String position = "";
 
     public final ContainerData data;
 
@@ -96,7 +116,7 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
             public int get(int pIndex) {
                 return switch (pIndex) {
                     case 0 -> ArmadilloHiveBlockEntity.this.progress;
-                    case 1 -> ArmadilloHiveBlockEntity.this.maxProgress;
+                    case 1 -> maxProgress;
                     default -> 0;
                 };
             }
@@ -105,13 +125,13 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
             public void set(int pIndex, int pValue) {
                 switch (pIndex) {
                     case 0 -> ArmadilloHiveBlockEntity.this.progress = pValue;
-                    case 1 -> ArmadilloHiveBlockEntity.this.maxProgress = pValue;
+                    case 1 -> maxProgress = pValue;
                 }
             }
 
             @Override
             public int getCount() {
-                return 3;
+                return 2;
             }
         };
     }
@@ -123,21 +143,21 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
     /* Block Entity */
 
     public void tick(Level level, BlockPos pos, BlockState state, ArmadilloHiveBlockEntity blockEntity) {
-        boolean dirty = false;
+        boolean dirty = true;
         detectAndStoreArmadillo(level, pos, blockEntity, state);
-        blockEntity.goingToBeCrafted();
 
-
-        if (blockEntity.progress > 0) {
-            level.setBlockAndUpdate(pos, state.setValue(ArmadilloHiveBlock.LIT, true));
+        if (!isArmadilloDataEmpty() || !isArmadilloData2Empty()) {
+            level.setBlockAndUpdate(pos, state.setValue(ARMADILLO_DATA, true));
         } else {
-            level.setBlockAndUpdate(pos, state.setValue(ArmadilloHiveBlock.LIT, false));
+            level.setBlockAndUpdate(pos, state.setValue(ARMADILLO_DATA, false));
         }
 
         if (blockEntity.hasRecipe()) {
             blockEntity.progress++;
-            if (blockEntity.progress >= blockEntity.maxProgress) {
-                blockEntity.craftItem(blockEntity);
+            if (blockEntity.progress >= maxProgress) {
+                if (blockEntity.hasRecipe()) {
+                    blockEntity.craftItem(blockEntity);
+                }
                 blockEntity.progress = 0;
                 dirty = true;
             }
@@ -149,6 +169,8 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
             }
         }
 
+        blockEntity.goingToBeCrafted();
+
         if (dirty) {
             blockEntity.setChanged();
             level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
@@ -156,7 +178,7 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
     }
 
     private boolean hasRecipe() {
-        if ((getSlotInputItems(3).getItem() == Items.DIRT) || (getSlotInputItems(3).getItem() == Items.STONE)) {
+        if (!isArmadilloDataEmpty() && !isArmadilloData2Empty()) {
             Level level = this.level;
             if (level == null) return false;
 
@@ -165,11 +187,39 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
                 inventory.setItem(i, inputItems.getStackInSlot(i));
             }
 
-            Optional<RecipeHolder<RoostRecipe>> alcheRecipe = level.getRecipeManager()
-                    .getRecipeFor(ModRecipes.ROOST_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
 
+            Optional<RecipeHolder<BreedingRecipe>> breedingRecipe = level.getRecipeManager()
+                    .getRecipeFor(ModRecipes.BREEDING_ARMADILLO_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
 
-            return (alcheRecipe.isPresent() && canInsertAmountIntoOutputSlot(inventory));
+            String armadillo1Item = getStoredArmadilloDataValue("resource_quality");
+            String armadillo2Item = getStoredArmadilloData2Value("resource_quality");
+
+            if (armadillo1Item.equals(armadillo2Item)) {
+
+                ItemStack stack1 = inputItems.getStackInSlot(0);
+                ItemStack stack2 = inputItems.getStackInSlot(1);
+
+                boolean matchesFoodIngredients = stack1.is(ItemTags.ARMADILLO_FOOD) && stack2.is(ItemTags.ARMADILLO_FOOD);
+
+                return matchesFoodIngredients;
+            }
+
+            if (breedingRecipe.isPresent()) {
+                BreedingRecipe recipe = breedingRecipe.get().value();
+
+                ItemStack armadillo1Stack = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(armadillo1Item.split(" ")[1])));
+                ItemStack armadillo2Stack = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(armadillo2Item.split(" ")[1])));
+
+                boolean matchesArmadilloIngredients =
+                        (recipe.armadillo_ingredient_1.test(armadillo1Stack) && recipe.armadillo_ingredient_2.test(armadillo2Stack)) ||
+                                (recipe.armadillo_ingredient_1.test(armadillo2Stack) && recipe.armadillo_ingredient_2.test(armadillo1Stack));
+
+                boolean matchesFoodIngredients =
+                        recipe.food_1.test(inputItems.getStackInSlot(0)) &&
+                                recipe.food_2.test(inputItems.getStackInSlot(1));
+
+                return matchesArmadilloIngredients && matchesFoodIngredients;
+            }
         }
         return false;
     }
@@ -188,16 +238,7 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
         };
     }
 
-    private boolean canInsertAmountIntoOutputSlot(SimpleContainer inventory) {
-        ItemStack outputStack1 = outputItems.getStackInSlot(0);
-
-        boolean canInsertIntoFirstSlot = outputStack1.isEmpty() || (outputStack1.getCount() < outputStack1.getMaxStackSize());
-
-        return canInsertIntoFirstSlot;
-    }
-
-
-    private void craftItem(ArmadilloHiveBlockEntity serverLevel) {
+    private void craftItem(ArmadilloHiveBlockEntity blockEntity) {
         Level level = this.level;
         if (level == null) return;
 
@@ -206,25 +247,44 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
             inventory.setItem(i, inputItems.getStackInSlot(i));
         }
 
-        Optional<RecipeHolder<RoostRecipe>> alcheRecipeOptional = level.getRecipeManager()
-                .getRecipeFor(ModRecipes.ROOST_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
+        Optional<RecipeHolder<BreedingRecipe>> breedingRecipe = level.getRecipeManager()
+                .getRecipeFor(ModRecipes.BREEDING_ARMADILLO_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
 
-        if (alcheRecipeOptional.isPresent()) {
-            if ((getSlotInputItems(3).getItem() == Items.DIRT) || (getSlotInputItems(3).getItem() == Items.STONE)) {
-                RoostRecipe recipe = alcheRecipeOptional.get().value();
+        if (breedingRecipe.isPresent()) {
+            String armadillo1Item = getStoredArmadilloDataValue("resource_quality").replaceAll("^\\d+\\s+", "");
+            String armadillo2Item = getStoredArmadilloData2Value("resource_quality").replaceAll("^\\d+\\s+", "");
+            ItemStack armadillo1Stack = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(armadillo1Item)));
+            ItemStack armadillo2Stack = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(armadillo2Item)));
+            BreedingRecipe recipe = breedingRecipe.get().value();
+
+            if (armadillo1Item.equals(armadillo2Item)) {
+
+                if (recipe.armadillo_ingredient_1.test(armadillo1Stack) && recipe.armadillo_ingredient_2.test(armadillo2Stack) || (recipe.armadillo_ingredient_1.test(armadillo2Stack) && recipe.armadillo_ingredient_2.test(armadillo1Stack))) {
+                } else {
+                    ItemStack result = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(armadillo1Item)));
+
+                    inputItems.extractItem(0, 1, false);
+                    inputItems.extractItem(1, 1, false);
+
+                    spawnResourceArmadillo(blockEntity);
+
+                    blockEntity.setChanged();
+                    level.sendBlockUpdated(blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity.getBlockState(), Block.UPDATE_CLIENTS);
+                    return;
+                }
+            }
+            if (recipe.armadillo_ingredient_1.test(armadillo1Stack) && recipe.armadillo_ingredient_2.test(armadillo2Stack) || (recipe.armadillo_ingredient_1.test(armadillo2Stack) && recipe.armadillo_ingredient_2.test(armadillo1Stack))) {
                 ItemStack result = recipe.getResultItem(level.registryAccess());
 
-                ItemStack outputStack = outputItems.getStackInSlot(0);
-                System.out.println("result: " + result.copy().toString());
-                if (outputStack.isEmpty()) {
-                    outputItems.setStackInSlot(0, result.copy());
-                }
-
-                spawnResourceArmadillo(serverLevel);
-                outputItems.extractItem(0, 1, false);
+                outputItems.setStackInSlot(0, result.copy());
 
                 inputItems.extractItem(0, 1, false);
                 inputItems.extractItem(1, 1, false);
+
+                spawnResourceArmadillo(blockEntity);
+
+                blockEntity.setChanged();
+                level.sendBlockUpdated(blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity.getBlockState(), Block.UPDATE_CLIENTS);
             }
         }
     }
@@ -238,46 +298,199 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
             inventory.setItem(i, inputItems.getStackInSlot(i));
         }
 
-        Optional<RecipeHolder<RoostRecipe>> alcheRecipeOptional = level.getRecipeManager()
-                .getRecipeFor(ModRecipes.ROOST_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
+        Optional<RecipeHolder<BreedingRecipe>> alcheRecipeOptional = level.getRecipeManager()
+                .getRecipeFor(ModRecipes.BREEDING_ARMADILLO_RECIPE_TYPE.get(), getRecipeInput(inventory), level);
+
+        String armadillo1Item = getStoredArmadilloDataValue("resource_quality").replaceAll("^\\d+\\s+", "");
+        String armadillo2Item = getStoredArmadilloData2Value("resource_quality").replaceAll("^\\d+\\s+", "");
+
+        ItemStack armadillo1Stack = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(armadillo1Item)));
+        ItemStack armadillo2Stack = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(armadillo2Item)));
 
         if (alcheRecipeOptional.isPresent()) {
-            if ((getSlotInputItems(3).getItem() == Items.DIRT)) {
-                RoostRecipe recipe = alcheRecipeOptional.get().value();
-                ItemStack result = recipe.getResultItem(level.registryAccess());
+            BreedingRecipe recipe = alcheRecipeOptional.get().value();
 
-                System.out.println("result from goingToBeCrafted: " + result.copy());
-                inputItems.setStackInSlot(4, result.copy());
+            if (armadillo1Item.equals(armadillo2Item)) {
+                if (!isArmadilloDataEmpty()) {
+                    if (recipe.armadillo_ingredient_1.test(armadillo1Stack) && recipe.armadillo_ingredient_2.test(armadillo2Stack) ||
+                            recipe.armadillo_ingredient_1.test(armadillo2Stack) && recipe.armadillo_ingredient_2.test(armadillo1Stack)) {
+                    } else {
+                        inputItems.setStackInSlot(4, armadillo1Stack.copy());
+                    }
+                }
             }
+
+            if (!isArmadilloDataEmpty()) {
+                if (recipe.armadillo_ingredient_1.test(armadillo1Stack) && recipe.armadillo_ingredient_2.test(armadillo2Stack) ||
+                        recipe.armadillo_ingredient_1.test(armadillo2Stack) && recipe.armadillo_ingredient_2.test(armadillo1Stack)) {
+                    ItemStack result = recipe.getResultItem(level.registryAccess());
+                    inputItems.setStackInSlot(4, result.copy());
+                }
+            }
+        } else {
         }
+    }
+
+    public boolean isCrafting() {
+        return progress > 0;
     }
 
     private void spawnResourceArmadillo(ArmadilloHiveBlockEntity blockEntity) {
-        if(!blockEntity.level.isClientSide()) {
-            ResourceArmadilloEntity ResourceArmadillo = new ResourceArmadilloEntity(ModEntities.RESOURCE_ARMADILLO.get(), level);
-            float rot = blockEntity.getBlockState().getValue(ArmadilloHiveBlock.FACING).toYRot();
-            Vec3 pos = new Vec3(0.0d, 0.75d, 0.1875d).yRot(-Mth.DEG_TO_RAD * rot).add(blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ() + 0.5);
-            ResourceArmadillo.setPos(pos);
-            ResourceArmadillo.yBodyRot = Mth.wrapDegrees(rot);
-            ResourceArmadillo.yHeadRot = Mth.wrapDegrees(rot);
+        if (!blockEntity.level.isClientSide()) {
+            ResourceArmadilloEntity resourceArmadillo = new ResourceArmadilloEntity(ModEntities.RESOURCE_ARMADILLO.get(), blockEntity.level);
 
-            ItemStack slotStack = blockEntity.getOutputItemInSlot(0);
-            ResourceArmadillo.setResource(new ItemStack(slotStack.getItem(), 1));
-
-            if (this.getSlotInputItems(3).getItem() == Items.STONE) {
-                ResourceArmadillo.setBabyAge(-2000);
+            String storedData = blockEntity.getStoredArmadilloData();
+            if (!storedData.isEmpty()) {
+                try {
+                    CompoundTag armadilloData = TagParser.parseTag(storedData);
+                    resourceArmadillo.load(armadilloData);
+                } catch (Exception e) {
+                    System.err.println("Failed to parse or load armadillo data: " + e.getMessage());
+                }
             }
 
-            blockEntity.level.addFreshEntity(ResourceArmadillo);
+            float rot = blockEntity.getBlockState().getValue(ArmadilloHiveBlock.FACING).toYRot();
+            Vec3 pos = new Vec3(0.0d, 0.5d, 0.1875d)
+                    .yRot(-Mth.DEG_TO_RAD * rot)
+                    .add(blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ() + 0.5);
+            resourceArmadillo.setPos(pos);
+            resourceArmadillo.yBodyRot = Mth.wrapDegrees(rot);
+            resourceArmadillo.yHeadRot = Mth.wrapDegrees(rot);
+
+            resourceArmadillo.setDeltaMovement(0, 0, 0);
+
+            ItemStack slotStack = blockEntity.getOutputItemInSlot(0);
+
+            if (!slotStack.isEmpty()) {
+                resourceArmadillo.setResource(new ItemStack(slotStack.getItem(), 1));
+            }
+
+            resourceArmadillo.setBabyAge(-2000);
+
+            resourceArmadillo.setUUID(UUID.randomUUID());
+
+            blockEntity.level.addFreshEntity(resourceArmadillo);
         }
     }
+
+    public void spawnResourceArmadilloFromData(ArmadilloHiveBlockEntity blockEntity, String Ypos, int slot) {
+        if (blockEntity.level.isClientSide()) {
+            System.out.println("Attempted to spawn armadillo on client side.");
+            return;
+        }
+
+        if (slot == 1 || slot == 3) {
+            if (!blockEntity.level.isClientSide() && !blockEntity.getStoredArmadilloData().isEmpty()) {
+                try {
+                    CompoundTag armadilloData = TagParser.parseTag(blockEntity.getStoredArmadilloData());
+
+                    LivingEntity resourceArmadillo;
+
+                    if (isArmadilloDataAResourceArmadillo()) {
+                        resourceArmadillo = new ResourceArmadilloEntity(ModEntities.RESOURCE_ARMADILLO.get(), blockEntity.level);
+                    } else {
+                        resourceArmadillo = new Armadillo(EntityType.ARMADILLO, blockEntity.level);
+                    }
+
+                    resourceArmadillo.load(armadilloData);
+
+                    if (Ypos == "0") {
+                        float rot = blockEntity.getBlockState().getValue(ArmadilloHiveBlock.FACING).toYRot();
+                        Vec3 pos = new Vec3(0.0d, 0, 0.1875d)
+                                .yRot(-Mth.DEG_TO_RAD * rot)
+                                .add(blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ() + 0.5);
+
+                        resourceArmadillo.setPos(pos);
+                        resourceArmadillo.yBodyRot = Mth.wrapDegrees(rot);
+                        resourceArmadillo.yHeadRot = Mth.wrapDegrees(rot);
+                    } else if (Ypos == "0.5") {
+                        float rot = blockEntity.getBlockState().getValue(ArmadilloHiveBlock.FACING).toYRot();
+                        Vec3 pos = new Vec3(0.0d, 0.5d, 0.1875d)
+                                .yRot(-Mth.DEG_TO_RAD * rot)
+                                .add(blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ() + 0.5);
+
+                        resourceArmadillo.setPos(pos);
+                        resourceArmadillo.yBodyRot = Mth.wrapDegrees(rot);
+                        resourceArmadillo.yHeadRot = Mth.wrapDegrees(rot);
+                    }
+
+                    resourceArmadillo.setDeltaMovement(0, 0, 0);
+
+                    blockEntity.level.addFreshEntity(resourceArmadillo);
+                    storedArmadilloData = "";
+
+                    lastArmadilloExitTime = System.currentTimeMillis();
+
+                    setChanged();
+                } catch (Exception e) {
+                    System.err.println("Failed to spawn ResourceArmadillo from stored data: " + e.getMessage());
+                }
+            } else if (blockEntity.getStoredArmadilloData().isEmpty()) {
+                System.out.println("Resource Armadillo:\n" +
+                        "the Armadillo data was somehow erased or it didn't even have one.");
+            }
+        }
+        if (slot == 2 || slot == 3) {
+            if (!blockEntity.level.isClientSide() && !blockEntity.getStoredArmadilloData2().isEmpty()) {
+                try {
+                    CompoundTag armadilloData = TagParser.parseTag(blockEntity.getStoredArmadilloData2());
+
+                    LivingEntity resourceArmadillo;
+
+                    if (isArmadilloData2AResourceArmadillo()) {
+                        resourceArmadillo = new ResourceArmadilloEntity(ModEntities.RESOURCE_ARMADILLO.get(), blockEntity.level);
+                    } else {
+                        resourceArmadillo = new Armadillo(EntityType.ARMADILLO, blockEntity.level);
+                    }
+
+                    resourceArmadillo.load(armadilloData);
+
+                    if (Ypos == "0") {
+                        float rot = blockEntity.getBlockState().getValue(ArmadilloHiveBlock.FACING).toYRot();
+                        Vec3 pos = new Vec3(0.0d, 0, 0.1875d)
+                                .yRot(-Mth.DEG_TO_RAD * rot)
+                                .add(blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ() + 0.5);
+
+                        resourceArmadillo.setPos(pos);
+                        resourceArmadillo.yBodyRot = Mth.wrapDegrees(rot);
+                        resourceArmadillo.yHeadRot = Mth.wrapDegrees(rot);
+                    } else if (Ypos == "0.5") {
+                        float rot = blockEntity.getBlockState().getValue(ArmadilloHiveBlock.FACING).toYRot();
+                        Vec3 pos = new Vec3(0.0d, 0.5d, 0.1875d)
+                                .yRot(-Mth.DEG_TO_RAD * rot)
+                                .add(blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ() + 0.5);
+
+                        resourceArmadillo.setPos(pos);
+                        resourceArmadillo.yBodyRot = Mth.wrapDegrees(rot);
+                        resourceArmadillo.yHeadRot = Mth.wrapDegrees(rot);
+                    }
+
+                    resourceArmadillo.setDeltaMovement(0, 0, 0);
+
+                    blockEntity.level.addFreshEntity(resourceArmadillo);
+                    storedArmadilloData2 = "";
+
+                    lastArmadilloExitTime = System.currentTimeMillis();
+
+                    setChanged();
+                } catch (Exception e) {
+                    System.err.println("Failed to spawn ResourceArmadillo from stored data: " + e.getMessage());
+                }
+            } else if (blockEntity.getStoredArmadilloData().isEmpty()) {
+                System.out.println("Resource Armadillo:\n" +
+                        "the Armadillo data was somehow erased or it didn't even have one.");
+            }
+        }
+    }
+
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("progress", this.progress);
         tag.putInt("maxProgress", this.maxProgress);
+        tag.putString("storedArmadilloData", this.storedArmadilloData);
+        tag.putString("storedArmadilloData2", this.storedArmadilloData2);
         tag.put("inputItems", inputItems.serializeNBT(registries));
-        tag.put("outputItems", outputItems.serializeNBT(registries));
     }
 
     @Override
@@ -285,9 +498,11 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
         super.loadAdditional(tag, registries);
         this.progress = tag.getInt("progress");
         this.maxProgress = tag.getInt("maxProgress");
+        this.storedArmadilloData = tag.getString("storedArmadilloData");
+        this.storedArmadilloData2 = tag.getString("storedArmadilloData2");
         inputItems.deserializeNBT(registries, tag.getCompound("inputItems"));
-        outputItems.deserializeNBT(registries, tag.getCompound("outputItems"));
     }
+
 
     private ItemStackHandler createItemHandler(int slots) {
         return new ItemStackHandler(slots) {
@@ -323,24 +538,12 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
         return inputItems;
     }
 
-    public ItemStack getSlotInputItems(int slot) {
-        return inputItems.getStackInSlot(slot);
-    }
-
-    public ItemStackHandler getOutputItems() {
-        return outputItems;
-    }
-
     public ItemStack getOutputItemInSlot(int slot) {
         return outputItems.getStackInSlot(slot);
     }
 
-    public Lazy<IItemHandler> getInputItemHandler() {
-        return inputItemHandler;
-    }
-
-    public Lazy<IItemHandler> getOutputItemHandler() {
-        return outputItemHandler;
+    public ItemStack getSlotInputItems(int slot) {
+        return inputItems.getStackInSlot(slot);
     }
 
     public int getProgress() {
@@ -359,7 +562,7 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("block.resource_armadillo.hive");
+        return Component.translatable("block.resource_armadillo.armadillo_hive");
     }
 
     public void dropItems() {
@@ -409,11 +612,6 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
                 return false;
             }
         }
-        for (int i = 0; i < outputItems.getSlots(); i++) {
-            if (!outputItems.getStackInSlot(i).isEmpty()) {
-                return false;
-            }
-        }
         return true;
     }
 
@@ -421,23 +619,21 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
     public ItemStack getItem(int pSlot) {
         if (pSlot < 4) {
             return inputItems.getStackInSlot(pSlot);
-        } else {
-            return outputItems.getStackInSlot(pSlot - 4);
         }
+        return null;
     }
 
     @Override
     public void setItem(int slot, ItemStack stack) {
         if (slot < 4) {
             inputItems.setStackInSlot(slot, stack);
-        } else {
-            outputItems.setStackInSlot(slot - 4, stack);
         }
         setChanged();
         if (!level.isClientSide) {
             markForUpdate();
         }
     }
+
 
     private void markForUpdate() {
         if (level instanceof ServerLevel serverLevel) {
@@ -449,12 +645,6 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
     public ItemStack removeItem(int slotIndex, int count) {
         int adjustedIndex = slotIndex - inputItems.getSlots();
 
-        if (adjustedIndex < outputItems.getSlots()) {
-            ItemStack stackInSlot = outputItems.getStackInSlot(adjustedIndex);
-            if (!stackInSlot.isEmpty()) {
-                return outputItems.extractItem(adjustedIndex, count, false);
-            }
-        }
         return ItemStack.EMPTY;
     }
 
@@ -469,14 +659,7 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
             }
         }
         int adjustedIndex = slotIndex - inputItems.getSlots();
-        if (adjustedIndex < outputItems.getSlots()) {
-            ItemStack stackInSlot = outputItems.getStackInSlot(adjustedIndex);
 
-            if (!stackInSlot.isEmpty()) {
-                outputItems.setStackInSlot(adjustedIndex, ItemStack.EMPTY);
-                return stackInSlot;
-            }
-        }
         return ItemStack.EMPTY;
     }
 
@@ -494,16 +677,163 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
         for (int i = 0; i < inputItems.getSlots(); i++) {
             inputItems.setStackInSlot(i, ItemStack.EMPTY);
         }
+    }
 
-        for (int i = 0; i < outputItems.getSlots(); i++) {
-            outputItems.setStackInSlot(i, ItemStack.EMPTY);
+    public void setStoredArmadilloData2(String data) {
+        this.storedArmadilloData2 = data;
+        setChanged();
+    }
+
+    public String getStoredArmadilloData2() {
+        return this.storedArmadilloData2;
+    }
+
+    public boolean isArmadilloData2Empty() {
+        return getStoredArmadilloData2().isEmpty();
+    }
+
+    public boolean isArmadilloData2AResourceArmadillo() {
+        String armadilloDataString = getStoredArmadilloData2();
+
+        if (armadilloDataString == null || armadilloDataString.isEmpty()) {
+            return false;
         }
+
+        try {
+            CompoundTag armadilloData = TagParser.parseTag(armadilloDataString);
+
+            if (armadilloData.contains("resource_quality")) {
+                return true;
+            }
+
+        } catch (CommandSyntaxException e) {
+            System.err.println("Failed to parse Armadillo data: " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    public String getStoredArmadilloData2Value(String key) {
+        String armadilloDataString = getStoredArmadilloData2();
+        if (armadilloDataString == null || armadilloDataString.isEmpty()) {
+            return "";
+        }
+
+        try {
+            CompoundTag armadilloData = TagParser.parseTag(armadilloDataString);
+
+            if (armadilloData.contains(key)) {
+                return armadilloData.getString(key);
+            }
+        } catch (CommandSyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    public boolean isArmadillo2Baby() {
+        String armadilloDataString = getStoredArmadilloData2();
+
+        if (armadilloDataString == null || armadilloDataString.isEmpty()) {
+            return false;
+        }
+
+        try {
+            CompoundTag armadilloData = TagParser.parseTag(armadilloDataString);
+
+            if (armadilloData.contains("Age")) {
+                int age = armadilloData.getInt("Age");
+                return age < 0;
+            }
+        } catch (CommandSyntaxException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
+    public void setStoredArmadilloData(String data) {
+        this.storedArmadilloData = data;
+        setChanged();
+    }
+
+    public String getStoredArmadilloData() {
+        return this.storedArmadilloData;
+    }
+
+    public boolean isArmadilloDataEmpty() {
+        return getStoredArmadilloData().isEmpty();
+    }
+
+    public boolean isArmadilloDataAResourceArmadillo() {
+        String armadilloDataString = getStoredArmadilloData();
+
+        if (armadilloDataString == null || armadilloDataString.isEmpty()) {
+            return false;
+        }
+
+        try {
+            CompoundTag armadilloData = TagParser.parseTag(armadilloDataString);
+
+            if (armadilloData.contains("resource_quality")) {
+                return true;
+            }
+
+        } catch (CommandSyntaxException e) {
+            System.err.println("Failed to parse Armadillo data: " + e.getMessage());
+        }
+
+        return false;
+    }
+
+    public String getStoredArmadilloDataValue(String key) {
+        String armadilloDataString = getStoredArmadilloData();
+        if (armadilloDataString == null || armadilloDataString.isEmpty()) {
+            return "";
+        }
+
+        try {
+            CompoundTag armadilloData = TagParser.parseTag(armadilloDataString);
+
+            if (armadilloData.contains(key)) {
+                return armadilloData.getString(key);
+            }
+        } catch (CommandSyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    public boolean isArmadilloBaby() {
+        String armadilloDataString = getStoredArmadilloData();
+
+        if (armadilloDataString == null || armadilloDataString.isEmpty()) {
+            return false;
+        }
+
+        try {
+            CompoundTag armadilloData = TagParser.parseTag(armadilloDataString);
+
+            if (armadilloData.contains("Age")) {
+                int age = armadilloData.getInt("Age");
+                return age < 0;
+            }
+        } catch (CommandSyntaxException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public void detectAndStoreArmadillo(Level level, BlockPos pos, ArmadilloHiveBlockEntity blockEntity, BlockState state) {
         if (level == null || level.isClientSide) return;
 
-        double radius = 1.95;
+        if (System.currentTimeMillis() - lastArmadilloExitTime < ARMADILLO_COOLDOWN_TIME) {
+            return;
+        }
+
+        double radius = 1.65;
         AABB searchArea = new AABB(
                 Vec3.atLowerCornerOf(pos.offset((int) -radius, (int) -radius, (int) -radius)),
                 Vec3.atLowerCornerOf(pos.offset((int) radius, (int) radius, (int) radius))
@@ -511,33 +841,61 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
 
         List<Armadillo> armadillos = level.getEntitiesOfClass(Armadillo.class, searchArea);
 
-        if (!(getSlotInputItems(3).getItem() == Items.DIRT || getSlotInputItems(3).getItem() == Items.STONE)) {
+        List<ResourceArmadilloEntity> resourceArmadillos = level.getEntitiesOfClass(ResourceArmadilloEntity.class, searchArea);
+
+        if (isArmadilloDataEmpty()) {
             if (!armadillos.isEmpty()) {
-                Armadillo armadillo = armadillos.get(0);
+                Armadillo armadillo = armadillos.stream().filter(a -> !a.isBaby()).findFirst().orElse(null);
+                if (armadillo != null) {
+                    CompoundTag armadilloData = new CompoundTag();
+                    armadillo.save(armadilloData);
 
-                if (armadillo.isBaby()) {
-                    setItem(3, Items.STONE.getDefaultInstance());
-                } else {
-                    setItem(3, Items.DIRT.getDefaultInstance());
+                    blockEntity.setStoredArmadilloData(armadilloData.toString());
+                    armadillo.discard();
+
+                    lastArmadilloExitTime = System.currentTimeMillis();
+                    blockEntity.setChanged();
                 }
-
-                armadillo.discard();
-
-                blockEntity.setChanged();
             }
-        } else if (!(getSlotInputItems(2).getItem() == Items.DIRT || getSlotInputItems(2).getItem() == Items.STONE)) {
-            if (!armadillos.isEmpty()) {
-                Armadillo armadillo = armadillos.get(0);
+            if (!resourceArmadillos.isEmpty()) {
+                ResourceArmadilloEntity resourceArmadillo = resourceArmadillos.stream().filter(a -> !a.isBaby()).findFirst().orElse(null);
+                if (resourceArmadillo != null) {
+                    CompoundTag armadilloData = new CompoundTag();
+                    resourceArmadillo.save(armadilloData);
 
-                if (armadillo.isBaby()) {
-                    setItem(2, Items.STONE.getDefaultInstance());
-                } else {
-                    setItem(2, Items.DIRT.getDefaultInstance());
+                    blockEntity.setStoredArmadilloData(armadilloData.toString());
+                    resourceArmadillo.discard();
+
+                    lastArmadilloExitTime = System.currentTimeMillis();
+                    blockEntity.setChanged();
                 }
+            }
+        } else if (isArmadilloData2Empty()) {
+            if (!armadillos.isEmpty()) {
+                Armadillo armadillo = armadillos.stream().filter(a -> !a.isBaby()).findFirst().orElse(null);
+                if (armadillo != null) {
+                    CompoundTag armadilloData = new CompoundTag();
+                    armadillo.save(armadilloData);
 
-                armadillo.discard();
+                    blockEntity.setStoredArmadilloData2(armadilloData.toString());
+                    armadillo.discard();
 
-                blockEntity.setChanged();
+                    lastArmadilloExitTime = System.currentTimeMillis();
+                    blockEntity.setChanged();
+                }
+            }
+            if (!resourceArmadillos.isEmpty()) {
+                ResourceArmadilloEntity resourceArmadillo = resourceArmadillos.stream().filter(a -> !a.isBaby()).findFirst().orElse(null);
+                if (resourceArmadillo != null) {
+                    CompoundTag armadilloData = new CompoundTag();
+                    resourceArmadillo.save(armadilloData);
+
+                    blockEntity.setStoredArmadilloData2(armadilloData.toString());
+                    resourceArmadillo.discard();
+
+                    lastArmadilloExitTime = System.currentTimeMillis();
+                    blockEntity.setChanged();
+                }
             }
         }
     }

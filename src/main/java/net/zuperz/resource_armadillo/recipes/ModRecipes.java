@@ -26,10 +26,16 @@ public class ModRecipes {
     public static final Supplier<RecipeType<ResourceArmadilloEntityRecipe>> RESOURCE_ARMADILLO_RECIPE_TYPE =
             RECIPE_TYPES.register("resource_armadillo", () -> ResourceArmadilloEntityRecipe.Type.INSTANCE);
 
+    public static final Supplier<RecipeType<BreedingRecipe>> BREEDING_ARMADILLO_RECIPE_TYPE =
+            RECIPE_TYPES.register("breeding", () -> BreedingRecipe.Type.INSTANCE);
+
 
     public static final Supplier<RecipeSerializer<RoostRecipe>> ATOMIC_OVEN_SERIALIZER =
             SERIALIZERS.register("roost", () -> RoostRecipe.Serializer.INSTANCE);
 
     public static final Supplier<RecipeSerializer<ResourceArmadilloEntityRecipe>> RESOURCE_ARMADILLO_SERIALIZER =
             SERIALIZERS.register("resource_armadillo", () -> ResourceArmadilloEntityRecipe.Serializer.INSTANCE);
+
+    public static final Supplier<RecipeSerializer<BreedingRecipe>> BREEDING_ARMADILLO_SERIALIZER =
+            SERIALIZERS.register("breeding", () -> BreedingRecipe.Serializer.INSTANCE);
 }

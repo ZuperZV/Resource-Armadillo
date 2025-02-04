@@ -10,7 +10,5 @@
   "scuteResource": {
     "item": "resource_armadillo:diamond_armadillo_scute"
   },
-  "overlayTexture": {
-    "item": "minecraft:diamond"
-  }
+  "overlayTexture": "minecraft:textures/entity/armadillo.png"
 }

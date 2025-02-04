@@ -1,22 +1,28 @@
 package net.zuperz.resource_armadillo.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.PlainTextButton;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ModEntities;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
+import net.zuperz.resource_armadillo.network.ScreenButton;
+import net.zuperz.resource_armadillo.screen.renderer.ComponentTooltip;
 import net.zuperz.resource_armadillo.screen.renderer.Tooltip;
 import net.zuperz.resource_armadillo.util.MouseUtil;
 import org.joml.Quaternionf;
@@ -27,7 +33,7 @@ import java.util.Optional;
 public class RoostScreen extends AbstractContainerScreen<RoostMenu> {
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "textures/gui/roost_gui.png");
-    private Tooltip ArmadilloTooltipTest;
+    private ComponentTooltip ArmadilloTooltipTest;
     private Tooltip ResourceArmadilloTooltipTest;
 
     public RoostScreen(RoostMenu container, Inventory inventory, Component title) {
@@ -38,27 +44,45 @@ public class RoostScreen extends AbstractContainerScreen<RoostMenu> {
     protected void init() {
         super.init();
 
+        Button button_1 = new PlainTextButton(this.leftPos + 46, this.topPos + 11, 25, 25, Component.translatable(""), e -> {
+            BlockPos pos = this.menu.blockentity.getBlockPos();
+            PacketDistributor.sendToServer(new ScreenButton(0, pos.getX(), pos.getY(), pos.getZ()));
+            System.out.println("Button clicked in RoostScreen!");
+        }, this.font);
+        this.addRenderableWidget(button_1);
+
+
         ArmadilloTooltip();
         ResourceArmadilloTooltip();
     }
 
+
+    /*
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
 
         if (isMouseAboveArea((int) mouseX, (int) mouseY, x, y, 46, 11, 25, 25)) {
-            menu.blockentity.spawnResourceArmadilloFromData(menu.blockentity);
-            System.out.println("test");
+            System.out.println("Mouse clicked on armadillo area.");
+
+            if (menu.blockentity != null) {
+                menu.blockentity.spawnResourceArmadilloFromData(menu.blockentity);
+                System.out.println("Called spawnResourceArmadilloFromData.");
+            } else {
+                System.err.println("Block entity is null.");
+            }
+
             return true;
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
-
+     */
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int pMouseX, int pMouseY) {
+        super.renderLabels(guiGraphics, pMouseX, pMouseY);
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
 
@@ -94,7 +118,7 @@ public class RoostScreen extends AbstractContainerScreen<RoostMenu> {
             if (menu.isCrafting()) {
 
                 int size = 0;
-                if (menu.isSlotItem(3).getItem() == Items.STONE) {
+                if (menu.blockentity.isArmadilloBaby()) {
                     size = 1;
                 }
 
@@ -118,9 +142,9 @@ public class RoostScreen extends AbstractContainerScreen<RoostMenu> {
 
 
         if (level != null) {
-            if (menu.isSlotItem(3).getItem() == Items.DIRT || menu.isSlotItem(3).getItem() == Items.STONE) {
+            if (!menu.blockentity.isArmadilloDataEmpty()) {
                 int size = 20;
-                if (menu.isSlotItem(3).getItem() == Items.STONE) {
+                if (menu.blockentity.isArmadilloBaby()) {
                     size = 10;
                 }
 
@@ -142,9 +166,9 @@ public class RoostScreen extends AbstractContainerScreen<RoostMenu> {
     }
 
     private void renderArmadilloAreaTooltip(GuiGraphics guiGraphics, int pMouseX, int pMouseY, int x, int y) {
-        if(isMouseAboveArea(pMouseX, pMouseY, x, y, 46, 11, 25, 25)) {
-            if (menu.isSlotItem(3).getItem() == Items.DIRT || menu.isSlotItem(3).getItem() == Items.STONE) {
-                guiGraphics.renderTooltip(this.font, ArmadilloTooltipTest.getTooltips(),
+        if (isMouseAboveArea(pMouseX, pMouseY, x, y, 46, 11, 25, 25)) {
+            if (!menu.blockentity.isArmadilloDataEmpty()) {
+                guiGraphics.renderTooltip(this.font, ArmadilloTooltipTest.getComponentTooltips(),
                         Optional.empty(), pMouseX - x, pMouseY - y);
             }
         }
@@ -152,22 +176,29 @@ public class RoostScreen extends AbstractContainerScreen<RoostMenu> {
 
     private void ArmadilloTooltip() {
         String newTooltipText;
-        if (menu.isSlotItem(3).getItem() == Items.STONE) {
+        if (menu.blockentity.isArmadilloBaby()) {
             newTooltipText = "Baby Armadillo";
         } else {
             newTooltipText = "Armadillo";
         }
-        ArmadilloTooltipTest = new Tooltip(46,
-                11, newTooltipText, 25, 25);
-    }
 
+        Component tooltipText = Component.literal(newTooltipText);
+
+        Component tooltipText2 = CommonComponents.EMPTY;
+
+        Component tooltipText3 = (Component.translatable("tool_tip.resource_armadillo.left_click")
+                .append(Component.literal(newTooltipText).withStyle(ChatFormatting.GRAY))
+                .append(Component.translatable("tool_tip.resource_armadillo.out_of_the_roost")));
+
+        ArmadilloTooltipTest = new ComponentTooltip(46, 11, tooltipText, tooltipText2, tooltipText3, 25, 25);
+    }
 
 
 
     private void renderResourceArmadilloAreaTooltip(GuiGraphics guiGraphics, int pMouseX, int pMouseY, int x, int y) {
         if (isMouseAboveArea(pMouseX, pMouseY, x, y, 120, 32, 25, 25)) {
             if (ResourceArmadilloTooltipTest != null) {
-                if (menu.isSlotItem(3).getItem() == Items.DIRT || menu.isSlotItem(3).getItem() == Items.STONE) {
+                if (!menu.blockentity.isArmadilloDataEmpty()) {
                     guiGraphics.renderTooltip(this.font, ResourceArmadilloTooltipTest.getTooltips(),
                             Optional.empty(), pMouseX - x, pMouseY - y);
                 }
@@ -196,7 +227,7 @@ public class RoostScreen extends AbstractContainerScreen<RoostMenu> {
             String stringGoingToBeCrafted = menu.blockentity.getSlotInputItems(4).toString();
             String newTooltipText = null;
             int size = 0;
-            if (menu.isSlotItem(3).getItem() == Items.STONE) {
+            if (menu.blockentity.isArmadilloBaby()) {
                 size = 1;
             }
 
@@ -211,12 +242,14 @@ public class RoostScreen extends AbstractContainerScreen<RoostMenu> {
             }
 
             else if (menu.blockentity.getProgress() > 0) {
-                newTooltipText = "Resource Armadillo";
-                if (size == 1) {
-                    newTooltipText = "Baby Resource Armadillo";
+                String babyText = menu.blockentity.isArmadilloBaby() ? "Baby " : "";
+                if (stringGoingToBeCrafted != null && !stringGoingToBeCrafted.isEmpty()) {
+                    String[] parts = stringGoingToBeCrafted.split(":");
+                    String itemName = parts.length > 1 ? parts[1] : parts[0];
+                    newTooltipText = babyText + itemName.substring(0, 1).toUpperCase() + itemName.substring(1) + " Resource Armadillo";
+                } else {
+                    newTooltipText = babyText + "Resource Armadillo";
                 }
-            } else {
-                newTooltipText = null;
             }
 
             if (newTooltipText != null && !newTooltipText.equals(lastTooltipText)) {
@@ -238,6 +271,8 @@ public class RoostScreen extends AbstractContainerScreen<RoostMenu> {
         renderBg(guiGraphics, partialTick, mouseX, mouseY);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+        ResourceArmadilloTooltip();
+        ArmadilloTooltip();
     }
 
     private boolean isMouseAboveArea(int pMouseX, int pMouseY, int x, int y, int offsetX, int offsetY, int width, int height) {

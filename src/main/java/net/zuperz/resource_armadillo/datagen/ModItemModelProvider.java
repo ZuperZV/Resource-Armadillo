@@ -1,5 +1,6 @@
 package net.zuperz.resource_armadillo.datagen;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -11,6 +12,7 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
 import net.zuperz.resource_armadillo.item.ModItems;
+import net.zuperz.resource_armadillo.util.ArmadilloScuteRegistry;
 
 public class ModItemModelProvider extends ItemModelProvider {
     public ModItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
@@ -19,7 +21,23 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
+        withExistingParent(ModItems.RESOURCE_ARMADILLO_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+        withExistingParent(ModItems.ARMADILLO_TAB.getId().getPath(), mcLoc("resource_armadillo:item/template_resource_armadillo"));
+
         basicItem(ModItems.IRON_BRUSH.get());
+        basicItem(ModItems.ARMADILLO_PART.get());
+
+        ArmadilloScuteRegistry registry = ArmadilloScuteRegistry.getInstance();
+        for (var scute : registry.getArmadilloScuteTypes()) {
+            if (scute.isEnabled()) {
+                String scuteName = scute.getName() + "_scute";
+                ResourceLocation scuteLocation = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, scuteName);
+                Item scuteItem = BuiltInRegistries.ITEM.get(scuteLocation);
+                if (scuteItem != null) {
+                    basicItem(scuteItem);
+                }
+            }
+        }
     }
 
     private ItemModelBuilder handheldItem(DeferredItem<Item> item) {

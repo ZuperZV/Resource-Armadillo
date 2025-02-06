@@ -3,20 +3,26 @@ package net.zuperz.resource_armadillo.block.entity.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.FloatTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.Vec3;
 import net.zuperz.resource_armadillo.block.custom.RoostBlock;
 import net.zuperz.resource_armadillo.block.entity.custom.RoostBlockEntity;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 /*
  *  MIT License
@@ -74,6 +80,8 @@ public class RoostBlockEntityRenderer implements BlockEntityRenderer<RoostBlockE
         Entity renderEntity = EntityType.ARMADILLO.create(level);
         if (renderEntity != null) {
             renderEntity.setPos(position.x, position.y, position.z);
+            renderEntity.setNoGravity(true);
+            renderEntity.setYHeadRot(0);
 
             entityRenderer.render(renderEntity, 0.0d, 0.0d, 0.0d, 0.0f, partialTick, poseStack, bufferSource, getLightLevel(level, pos));
         }

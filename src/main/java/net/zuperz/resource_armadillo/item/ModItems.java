@@ -34,12 +34,6 @@ public class ModItems {
     public static final DeferredItem<Item> ARMADILLO_TAB = ITEMS.register("armadillo_tab",
             () -> new RainbowItem(new Item.Properties()));
 
-
-    public static List<Item> getRegisteredScuteItems() {
-        return ArmadilloScuteRegistry.getInstance().getArmadilloScuteTypes().stream().map(ArmadilloScuteType::getEssenceItem).filter(Objects::nonNull).toList();
-    }
-
-
     @SubscribeEvent
     public static void onRegisterItems(RegisterEvent event) {
         event.register(Registries.ITEM, registry -> {

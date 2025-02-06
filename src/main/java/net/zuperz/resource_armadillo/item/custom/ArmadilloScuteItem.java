@@ -1,6 +1,7 @@
 package net.zuperz.resource_armadillo.item.custom;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.zuperz.resource_armadillo.util.ArmadilloScuteType;
@@ -11,6 +12,10 @@ public class ArmadilloScuteItem extends Item {
     public ArmadilloScuteItem(ArmadilloScuteType armadilloScuteType) {
         super(new Item.Properties());
         this.armadilloScuteType = armadilloScuteType;
+    }
+
+    public ArmadilloScuteType getScuteType() {
+        return this.armadilloScuteType;
     }
 
     @Override
@@ -29,5 +34,9 @@ public class ArmadilloScuteItem extends Item {
     @Override
     public String getDescriptionId(ItemStack pStack) {
         return "item.resource_armadillo_scute.resource_armadillo_scute";
+    }
+
+    public ResourceLocation getTexture() {
+        return this.armadilloScuteType.getTexture();
     }
 }

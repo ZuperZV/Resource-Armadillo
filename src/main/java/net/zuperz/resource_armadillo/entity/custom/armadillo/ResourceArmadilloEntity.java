@@ -3,12 +3,15 @@ package net.zuperz.resource_armadillo.entity.custom.armadillo;
 import com.mojang.serialization.Dynamic;
 import io.netty.buffer.ByteBuf;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntFunction;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -17,6 +20,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.game.DebugPackets;
 import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -27,6 +31,7 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.*;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
@@ -39,19 +44,30 @@ import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.zuperz.resource_armadillo.ResourceArmadillo;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ai.ResourceArmadilloAi;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.type.ResourceEntityDataSerializers;
+import net.zuperz.resource_armadillo.item.ModArmadilloScutes;
+import net.zuperz.resource_armadillo.item.ModItems;
+import net.zuperz.resource_armadillo.item.custom.ArmadilloScuteItem;
 import net.zuperz.resource_armadillo.recipes.ResourceArmadilloEntityRecipe;
 import net.zuperz.resource_armadillo.recipes.ModRecipes;
+import net.zuperz.resource_armadillo.util.ArmadilloScuteRegistry;
+import net.zuperz.resource_armadillo.util.ArmadilloScuteType;
+
+import static com.ibm.icu.impl.ValidIdentifiers.Datatype.variant;
 
 public class ResourceArmadilloEntity extends Animal {
     public static final float BABY_SCALE = 0.6F;
@@ -68,8 +84,11 @@ public class ResourceArmadilloEntity extends Animal {
     private double productionEfficiency = (generateproductionEfficiency(pRandom::nextDouble));
 
     private static final EntityDataAccessor<ArmadilloState> ARMADILLO_STATE = SynchedEntityData.defineId(
-            ResourceArmadilloEntity.class, ResourceEntityDataSerializers.RESOURCE_ARMADILLO_STATE
-    );
+            ResourceArmadilloEntity.class, ResourceEntityDataSerializers.RESOURCE_ARMADILLO_STATE);
+
+    private static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(
+            ResourceArmadilloEntity.class, EntityDataSerializers.INT);
+
 
     private long inStateTicks = 0L;
     public final AnimationState rollOutAnimationState = new AnimationState();
@@ -80,6 +99,7 @@ public class ResourceArmadilloEntity extends Animal {
     private int scuteCountTime = 0;
     public ResourceLocation overlayTexture;
     BlockPos hivePos;
+    private boolean armadillo_part = true;
 
     private boolean peekReceivedClient = false;
 
@@ -90,65 +110,17 @@ public class ResourceArmadilloEntity extends Animal {
     }
 
     /* Resource */
-
-    public ItemStack getResource() {
-        return this.resource;
-    }
-
     public void setResource(ItemStack resource) {
         this.resource = resource;
-    }
-
-    public void setOverlayTexture(ResourceLocation texture) {
-        this.overlayTexture = texture;
-    }
-
-    public ResourceLocation craftItem() {
-        System.out.println("craftItem() blev kaldt!");
-        Level level = this.level();
-
-        SimpleContainer recipeInputContainer = new SimpleContainer(1);
-        recipeInputContainer.setItem(0, resource);
-
-        Optional<RecipeHolder<ResourceArmadilloEntityRecipe>> recipeHolder = level.getRecipeManager()
-                .getRecipeFor(ModRecipes.RESOURCE_ARMADILLO_RECIPE_TYPE.get(), getRecipeInput(recipeInputContainer), level);
-
-        if (recipeHolder.isPresent()) {
-            System.out.println("craftItem recipeHolder.isPresent(): " + recipeHolder.isPresent());
-            ResourceArmadilloEntityRecipe recipe = recipeHolder.get().value();
-            String result = recipe.getOverlayTexture();
-            System.out.println("getOverlayTexture: " + recipe.getOverlayTexture());
-
-            if (result.isEmpty()) {
-                System.out.println("result.isEmpty: " + result.isEmpty());
-                System.err.println("Opskriften returnerede et tomt resultat.");
-                return null;
-            }
-
-            String[] parts = result.toString().split(":", 2); //"minecraft:textures/entity/armadillo.png"
-            String namespace = parts[0];
-            String path = parts[1];
-
-            ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(namespace, path);
-            System.out.println("resourceLocation: " + resourceLocation);
-            setOverlayTexture(resourceLocation);
-            return resourceLocation;
-
-        } else {
-        }
-        return null;
-    }
-
-    public ResourceLocation craftItemAndHasRecipe() {
-        if (hasRecipe()) {
-            return(craftItem());
-        }
-        return null;
     }
 
     @Override
     public void tick() {
         super.tick();
+
+        updateVariantFromResourceNotClient();
+
+        System.out.println("resource: " + resource);
 
         if (this.level().isClientSide()) {
             this.setupAnimationStates();
@@ -169,44 +141,33 @@ public class ResourceArmadilloEntity extends Animal {
         }
     }
 
-    private boolean hasRecipe() {
-        Level level = this.level();
-        if (level == null) return false;
+    public void updateVariantFromResource() {
+        ArmadilloScuteType newVariant = ArmadilloScuteRegistry.getInstance().getArmadilloScuteTypes().get(0);
 
-        SimpleContainer recipeInputContainer = new SimpleContainer(1);
-        recipeInputContainer.setItem(0, resource.copy());
-
-        Optional<RecipeHolder<ResourceArmadilloEntityRecipe>> recipeHolder = level.getRecipeManager()
-                .getRecipeFor(ModRecipes.RESOURCE_ARMADILLO_RECIPE_TYPE.get(), getRecipeInput(recipeInputContainer), level);
-
-        if (recipeHolder.isPresent()) {
-            ResourceArmadilloEntityRecipe recipe = recipeHolder.get().value();
-
-            boolean ingredientMatches = recipe.resource.test(resource);
-            System.out.println("Ingredient matches: " + ingredientMatches);
-
-            return ingredientMatches;
-        } else {
+        if (this.resource.getItem() instanceof ArmadilloScuteItem scuteItem) {
+            newVariant = scuteItem.getScuteType();
         }
 
-        return false;
+        if (!newVariant.equals(getVariant())) {
+            setVariant(newVariant);
+        }
     }
 
 
+    private void updateVariantFromResourceNotClient() {
+        if (this.level().isClientSide()) return;
 
-    private RecipeInput getRecipeInput(SimpleContainer inventory) {
-        return new RecipeInput() {
-            @Override
-            public ItemStack getItem(int index) {
-                return inventory.getItem(index).copy();
-            }
+        ArmadilloScuteType newVariant = ArmadilloScuteRegistry.getInstance().getArmadilloScuteTypes().get(0);
 
-            @Override
-            public int size() {
-                return inventory.getContainerSize();
-            }
-        };
+        if (this.resource.getItem() instanceof ArmadilloScuteItem scuteItem) {
+            newVariant = scuteItem.getScuteType();
+        }
+
+        if (!newVariant.equals(getVariant())) {
+            setVariant(newVariant);
+        }
     }
+
 
     protected static double generateProductionSpeed(DoubleSupplier pSupplier) {
         return 1F + pSupplier.getAsDouble() * 0.2 + pSupplier.getAsDouble() * 0.2 + pSupplier.getAsDouble() * 0.2;
@@ -221,46 +182,6 @@ public class ResourceArmadilloEntity extends Animal {
     }
 
     /* Armadillo */
-
-
-    public void setHivePos(BlockPos p_330297_) {
-        this.hivePos = p_330297_;
-    }
-
-    @VisibleForDebug
-    public boolean hasHive() {
-        return this.hivePos != null;
-    }
-
-    @Nullable
-    @VisibleForDebug
-    public BlockPos getHivePos() {
-        return this.hivePos;
-    }
-
-    public boolean wantsToEnterHive() {
-        if (this.getTarget() == null) {
-            boolean flag = this.level().isRaining() || this.level().isNight();
-            return flag;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean canResourceArmadilloEntityUse() {
-        if (ResourceArmadilloEntity.this.hasHive()
-                && ResourceArmadilloEntity.this.wantsToEnterHive()
-                && ResourceArmadilloEntity.this.hivePos.closerToCenterThan(ResourceArmadilloEntity.this.position(), 2.0)
-                && ResourceArmadilloEntity.this.level().getBlockEntity(ResourceArmadilloEntity.this.hivePos) instanceof BeehiveBlockEntity beehiveblockentity) {
-            if (!beehiveblockentity.isFull()) {
-                return true;
-            }
-
-            ResourceArmadilloEntity.this.hivePos = null;
-        }
-
-        return false;
-    }
 
     @Override
     @Nullable
@@ -302,9 +223,6 @@ public class ResourceArmadilloEntity extends Animal {
         return stack.is(ItemTags.ARMADILLO_FOOD);
     }
 
-
-
-
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH,
                 12.0).add(Attributes.MOVEMENT_SPEED, 0.14);
@@ -314,6 +232,44 @@ public class ResourceArmadilloEntity extends Animal {
     protected void defineSynchedData(SynchedEntityData.Builder pBuilder) {
         super.defineSynchedData(pBuilder);
         pBuilder.define(ARMADILLO_STATE, ResourceArmadilloEntity.ArmadilloState.IDLE);
+        pBuilder.define(VARIANT, 0);
+    }
+    private int getTypeVariant() {
+        return this.entityData.get(VARIANT);
+    }
+
+    public ArmadilloScuteType getVariant() {
+        return ArmadilloScuteRegistry.getInstance().getArmadilloScuteTypes().get(this.getTypeVariant());
+    }
+
+    public void setVariant(ArmadilloScuteType variant) {
+        int index = ArmadilloScuteRegistry.getInstance().getArmadilloScuteTypes().indexOf(variant);
+        this.entityData.set(VARIANT, index);
+    }
+
+    @Override
+    @Nullable
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pSpawnType,
+                                        @Nullable SpawnGroupData pSpawnGroupData) {
+        var scuteTypes = ArmadilloScuteRegistry.getInstance().getArmadilloScuteTypes();
+        ArmadilloScuteType randomScute = scuteTypes.get(this.random.nextInt(scuteTypes.size()));
+        if (!scuteTypes.isEmpty()) {
+            List<ArmadilloScuteType> validScuteTypes = scuteTypes.stream()
+                    .filter(scute -> !scute.getName().equals("none"))
+                    .toList();
+            if (!validScuteTypes.isEmpty()) {
+                randomScute = validScuteTypes.get(this.random.nextInt(validScuteTypes.size()));
+                this.setVariant(randomScute);
+            }
+            String scuteName = randomScute.getName() + "_scute";
+            ResourceLocation scuteLocation = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, scuteName);
+            Item scuteItem = BuiltInRegistries.ITEM.get(scuteLocation);
+            if (scuteItem != null) {
+                this.resource = new ItemStack(scuteItem);
+            }
+        }
+
+        return super.finalizeSpawn(pLevel, pDifficulty, pSpawnType, pSpawnGroupData);
     }
 
     public boolean isScared() {
@@ -474,12 +430,16 @@ public class ResourceArmadilloEntity extends Animal {
     public void addAdditionalSaveData(CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         pCompound.putString("state", this.getState().getSerializedName());
+
+        System.out.println("resource_quality: " + getResource().toString());
+        pCompound.putString("resource_quality", (getResource().toString()));
+
+        pCompound.putBoolean("armadillo_part", this.armadillo_part);
+
         pCompound.putInt("scute_time", this.scuteTime);
         pCompound.putInt("scute_count", this.scuteCount);
         pCompound.putInt("scute_count_time", this.scuteCountTime);
-
-        pCompound.putString("resource_quality", (getResource().toString()));
-
+        pCompound.putInt("variant", this.getTypeVariant());
     }
 
     @Override
@@ -489,23 +449,26 @@ public class ResourceArmadilloEntity extends Animal {
         if (pCompound.contains("scute_time")) {
             this.scuteTime = pCompound.getInt("scute_time");
         }
+        if (pCompound.contains("resource_quality")) {
+            String resourceItem = pCompound.getString("resource_quality");
+            String[] parts = resourceItem.split(" ", 2);
+            String cleanedResource = parts.length > 1 ? parts[1] : parts[0];
+            System.out.println("readAdditionalSaveData: " + BuiltInRegistries.ITEM.get(ResourceLocation.parse(cleanedResource)).getDefaultInstance());
+            this.resource = BuiltInRegistries.ITEM.get(ResourceLocation.parse(cleanedResource)).getDefaultInstance();
+        }
+
+        if (pCompound.contains("armadillo_part")) {
+            this.armadillo_part = pCompound.getBoolean("armadillo_part");
+        }
+
         if (pCompound.contains("scute_count")) {
             this.scuteCount = pCompound.getInt("scute_count");
         }
         if (pCompound.contains("scute_count_time")) {
             this.scuteCountTime = pCompound.getInt("scute_count_time");
         }
-
-        if (pCompound.contains("resource_quality")) {
-            String resourceItem = pCompound.getString("resource_quality");
-
-            String[] parts = resourceItem.split(" ", 2);
-            String cleanedResource = parts.length > 1 ? parts[1] : parts[0];
-
-            this.resource = BuiltInRegistries.ITEM.get(ResourceLocation.parse(cleanedResource)).getDefaultInstance();
-
-            ////System.out.println("resource was: " + pCompound.getString("resource_quality"));
-            ////System.out.println("resource is: " + resource);
+        if (pCompound.contains("variant")) {
+            this.entityData.set(VARIANT, pCompound.getInt("variant"));
         }
     }
 
@@ -555,21 +518,34 @@ public class ResourceArmadilloEntity extends Animal {
     @Override
     public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
-        if (itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH) && scuteCount > 0 && this.brushOffScute()) {
+        if (itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH) && scuteCount > 0 && this.brushOffScute() ) {
             itemstack.hurtAndBreak(16, pPlayer, getSlotForHand(pHand));
             scuteCount--;
             return InteractionResult.sidedSuccess(this.level().isClientSide);
-        } else if (!itemstack.isEmpty() && !itemstack.is(ItemTags.ARMADILLO_FOOD) && !(itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH))) {
+        } else if (itemstack.is(Items.SHEARS) && this.shearOffScute()) {
+            itemstack.hurtAndBreak(5, pPlayer, getSlotForHand(pHand));
+        } else if (!itemstack.isEmpty() && !itemstack.is(ItemTags.ARMADILLO_FOOD) && !(itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH) && !(itemstack.is(Items.SHEARS)))) {
             setResource(itemstack);
             pPlayer.sendSystemMessage(Component.literal("Item used in setResource: " + itemstack.getDisplayName().getString()));
             pPlayer.sendSystemMessage(Component.literal("scuteCount: " + scuteCount));
-        } else if (itemstack.isEmpty() && !(itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH))) {
+        } else if (itemstack.isEmpty() && !(itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH) && !(itemstack.is(Items.SHEARS)))) {
             pPlayer.sendSystemMessage(Component.literal("resource is: " + getResource().getDisplayName().getString()));
             pPlayer.sendSystemMessage(Component.literal("scuteCount is: " + scuteCount));
             pPlayer.sendSystemMessage(Component.literal("scuteCountTime is: " + scuteCountTime));
             pPlayer.sendSystemMessage(Component.literal("scuteTime is: " + scuteTime));
         }
         return this.isScared() ? InteractionResult.FAIL : super.mobInteract(pPlayer, pHand);
+    }
+
+    private Boolean hasArmadilloPart() {
+        if (armadillo_part) {
+            return true;
+        }
+        else return false;
+    }
+
+    private void setArmadilloPart(boolean booleankey) {
+        armadillo_part = booleankey;
     }
 
     @Override
@@ -579,6 +555,19 @@ public class ResourceArmadilloEntity extends Animal {
         }
 
         super.ageUp(pAmount, pForced);
+    }
+
+    public boolean shearOffScute() {
+        if (this.isBaby()) {
+            return false;
+        } else if (hasArmadilloPart()){
+            this.spawnAtLocation(new ItemStack(ModItems.ARMADILLO_PART.get()));
+            this.gameEvent(GameEvent.ENTITY_INTERACT);
+            this.playSound(SoundEvents.ARMADILLO_BRUSH);
+            setArmadilloPart(false);
+            return true;
+        }
+        return false;
     }
 
     public boolean brushOffScute() {
@@ -647,6 +636,11 @@ public class ResourceArmadilloEntity extends Animal {
                 }
             }
         };
+    }
+
+    public ItemStack getResource() {
+        System.out.println("resource: " + resource);
+        return this.resource;
     }
 
     public static enum ArmadilloState implements StringRepresentable {

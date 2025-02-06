@@ -10,6 +10,6 @@
   },
 
   "output": {
-    "item": "minecraft:flint"
+    "item": "resource_armadillo:flint_scute"
   }
 }

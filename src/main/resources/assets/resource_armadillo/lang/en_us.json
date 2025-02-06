@@ -11,6 +11,9 @@
   "armadillo_scute.resource_armadillo.emerald": "Emerald",
   "armadillo_scute.resource_armadillo.diamond": "Diamond",
   "armadillo_scute.resource_armadillo.stone": "Stone",
+  "armadillo_scute.resource_armadillo.cobblestone": "Cobblestone",
+  "armadillo_scute.resource_armadillo.flint": "Flint",
+  "armadillo_scute.resource_armadillo.coal": "Coal",
 
   "block.resource_armadillo.roost": "Roost",
   "block.resource_armadillo.armadillo_hive": "Armadillo Hive",

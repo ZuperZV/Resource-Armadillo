@@ -43,7 +43,7 @@ public class ModCreativeModeTabs {
 
                         ArmadilloScuteRegistry registry = ArmadilloScuteRegistry.getInstance();
                         for (var scute : registry.getArmadilloScuteTypes()) {
-                            if (scute.isEnabled()) {
+                            if (scute.isEnabled() && !scute.getName().equals("none")) {
                                 String scuteName = scute.getName() + "_scute";
                                 ResourceLocation scuteLocation = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, scuteName);
                                 Item scuteItem = BuiltInRegistries.ITEM.get(scuteLocation);

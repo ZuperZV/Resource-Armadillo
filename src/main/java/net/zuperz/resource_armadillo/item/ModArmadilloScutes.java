@@ -19,9 +19,14 @@ public class ModArmadilloScutes {
 
     private static final List<ArmadilloScuteType> SCUTE_TYPES = new ArrayList<>();
 
-    public static final ArmadilloScuteType EMERALD = register(new ArmadilloScuteType(ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "emerald"), Ingredient.of(Items.EMERALD), false));
-    public static final ArmadilloScuteType DIAMOND = register(new ArmadilloScuteType(ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "diamond"), Ingredient.of(Items.DIAMOND), true));
-    public static final ArmadilloScuteType STONE = register(new ArmadilloScuteType(ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "stone"), Ingredient.of(Blocks.STONE), true));
+    public static final ArmadilloScuteType NONE = register(new ArmadilloScuteType(ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "none"), ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "textures/entity/white_armadillo.png"), Ingredient.of(Items.AIR), true));
+
+    public static final ArmadilloScuteType EMERALD = register(new ArmadilloScuteType(ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "emerald"), ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "textures/entity/emerald_armadillo.png"), Ingredient.of(Items.EMERALD), true));
+    public static final ArmadilloScuteType DIAMOND = register(new ArmadilloScuteType(ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "diamond"), ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "textures/entity/diamond_armadillo.png"), Ingredient.of(Items.DIAMOND), true));
+    public static final ArmadilloScuteType STONE = register(new ArmadilloScuteType(ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "stone"), ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "textures/entity/stone_armadillo.png"), Ingredient.of(Blocks.STONE), true));
+    public static final ArmadilloScuteType COBBLESTONE = register(new ArmadilloScuteType(ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "cobblestone"), ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "textures/entity/cobblestone_armadillo.png"), Ingredient.of(Blocks.COBBLESTONE), true));
+    public static final ArmadilloScuteType FLINT = register(new ArmadilloScuteType(ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "flint"), ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "textures/entity/flint_armadillo.png"), Ingredient.of(Items.FLINT), true));
+    public static final ArmadilloScuteType COAL = register(new ArmadilloScuteType(ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "coal"), ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "textures/entity/coal_armadillo.png"), Ingredient.of(Items.COAL), true));
 
     private static ArmadilloScuteType register(ArmadilloScuteType type) {
         type.setEssenceItem(() -> new ArmadilloScuteItem(type), true);

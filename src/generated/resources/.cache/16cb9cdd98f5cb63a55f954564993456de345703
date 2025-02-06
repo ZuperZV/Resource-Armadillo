@@ -1,8 +1,11 @@
-// 1.21	2025-02-04T20:25:31.0478891	Item Models: resource_armadillo
+// 1.21	2025-02-05T19:13:20.0645261	Item Models: resource_armadillo
 dc4324aa3f5918034268bed5215b4c1bc7bb91c7 assets/resource_armadillo/models/item/armadillo_part.json
 e3c5fed607e9e9921f3296f17e3943d4b16138e5 assets/resource_armadillo/models/item/armadillo_tab.json
+47eaa4361b8e9e6a74b7d2ab890c34e5bb2d76a2 assets/resource_armadillo/models/item/coal_scute.json
+2521add09e9f0e7fb265398b1f8d2232c7c0d9a1 assets/resource_armadillo/models/item/cobblestone_scute.json
 ec7b480fb68bf5a7d7b7ba5e3a91de4057a641e0 assets/resource_armadillo/models/item/diamond_scute.json
 27f8e2c9b6e128d0550a347d16674ee47925a271 assets/resource_armadillo/models/item/emerald_scute.json
+533403e8986bc5af0bbe4422526cd2038453cf06 assets/resource_armadillo/models/item/flint_scute.json
 501f64f0d20ca934ec9d1ef9cf7243217f334329 assets/resource_armadillo/models/item/iron_brush.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/resource_armadillo/models/item/resource_armadillo_spawn_egg.json
 20c64a80a53cfebbe9249448c02a14024613ea17 assets/resource_armadillo/models/item/stone_scute.json

@@ -3,30 +3,45 @@ package net.zuperz.resource_armadillo.util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.zuperz.resource_armadillo.ResourceArmadillo;
-import net.zuperz.resource_armadillo.item.ModItems;
-import net.zuperz.resource_armadillo.item.custom.ArmadilloScuteItem;
 
 import java.util.function.Supplier;
+
+/*
+ *  MIT License
+ *  Copyright (c) 2020 BlakeBr0
+ *
+ *  This code is licensed under the "MIT License"
+ *  https://github.com/BlakeBr0/MysticalCustomization/blob/1.21/LICENSE
+ *
+ *  Modified by: ZuperZ
+ */
 
 public class ArmadilloScuteType {
 
     private final ResourceLocation id;
+    private ResourceLocation texture;
     private Component displayName;
     private Supplier<? extends Item> essence;
     private Ingredient craftingMaterial;
     private boolean enabled;
     private boolean registerEssenceItem;
 
-    public ArmadilloScuteType(ResourceLocation id, Ingredient craftingMaterial, boolean enabled) {
+    public ArmadilloScuteType(ResourceLocation id, ResourceLocation texture, Ingredient craftingMaterial, boolean enabled) {
         this.id = id;
         this.craftingMaterial = craftingMaterial;
         this.enabled = enabled;
         this.registerEssenceItem = true;
+        this.texture = texture;
+    }
+
+    public ResourceLocation getTexture() {
+        return this.texture;
+    }
+
+    public ArmadilloScuteType setTexture(ResourceLocation texture) {
+        this.texture = texture;
+        return this;
     }
 
     public ResourceLocation getId() {

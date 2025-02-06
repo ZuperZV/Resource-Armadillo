@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.ListTag;
@@ -22,6 +23,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -103,8 +105,13 @@ public class ArmadilloHiveScreen extends AbstractContainerScreen<ArmadilloHiveMe
                 int scaledProgress = menu.getBabyScaledEntityProgress();
 
                 ResourceArmadilloEntity armadillo = ModEntities.RESOURCE_ARMADILLO.get().create(level);
+                ItemStack itemStack = menu.blockentity.getSlotInputItems(4);
+
                 if (armadillo != null) {
+                    armadillo.setYHeadRot(0);
                     armadillo.setPos(0, 0, 0);
+                    armadillo.setResource(itemStack);
+                    armadillo.updateVariantFromResource();
                     InventoryScreen.renderEntityInInventory(
                             guiGraphics,
                             x + 132, y + 52,
@@ -179,6 +186,7 @@ public class ArmadilloHiveScreen extends AbstractContainerScreen<ArmadilloHiveMe
                 try {
                     if (menu.blockentity.isArmadilloData2AResourceArmadillo()) {
                         CompoundTag armadilloData = TagParser.parseTag(menu.blockentity.getStoredArmadilloData2());
+                        System.out.println("armadilloData data: " + armadilloData);
 
                         ListTag rotationTag = new ListTag();
                         rotationTag.add(FloatTag.valueOf(0.0f));
@@ -234,101 +242,46 @@ public class ArmadilloHiveScreen extends AbstractContainerScreen<ArmadilloHiveMe
     }
 
     private void ArmadilloTooltip() {
-        String newTooltipText;
         String itemName = "";
-
         if (menu.blockentity.isArmadilloDataAResourceArmadillo()) {
-            String resourceQualityData = menu.blockentity.getStoredArmadilloDataValue("resource_quality");
-            if (resourceQualityData == null || resourceQualityData.isEmpty()) {
-                resourceQualityData = "";
-            }
-
-            String[] parts = resourceQualityData.split(":");
-            itemName = parts.length > 1 ? parts[1] : parts[0];
-
-            itemName = itemName.substring(0, 1).toUpperCase() + itemName.substring(1);
-
-            itemName = formatItemName(itemName);
-            itemName = itemName + " ";
-
+            itemName = getFormattedItemName(menu.blockentity.getStoredArmadilloDataValue("resource_quality")) + " ";
         }
 
-        if (menu.blockentity.isArmadilloBaby()) {
-            newTooltipText = itemName + "Baby Armadillo";
-        } else {
-            newTooltipText = itemName + "Armadillo";
-        }
+        String armadilloType = menu.blockentity.isArmadilloBaby() ? "Baby Armadillo" : "Armadillo";
 
-        Component tooltipText = Component.literal(newTooltipText);
+        Component tooltipText = Component.literal(itemName + armadilloType);
         Component tooltipText2 = CommonComponents.EMPTY;
         Component tooltipText3 = Component.translatable("tool_tip.resource_armadillo.left_click")
-                .append(Component.literal(newTooltipText).withStyle(ChatFormatting.GRAY))
+                .append(Component.literal(" " + itemName + armadilloType).withStyle(ChatFormatting.GRAY))
                 .append(Component.translatable("tool_tip.resource_armadillo.out_of_the_roost"));
 
         ArmadilloTooltipTest = new ComponentTooltip(25, 36, tooltipText, tooltipText2, tooltipText3, 25, 25);
     }
 
     private void ArmadilloTooltip2() {
-        String newTooltipText;
         String itemName = "";
-
         if (menu.blockentity.isArmadilloData2AResourceArmadillo()) {
-            String resourceQualityData = menu.blockentity.getStoredArmadilloData2Value("resource_quality");
-            if (resourceQualityData == null || resourceQualityData.isEmpty()) {
-                resourceQualityData = "";
-            }
-
-            String[] parts = resourceQualityData.split(":");
-            itemName = parts.length > 1 ? parts[1] : parts[0];
-
-            itemName = itemName.substring(0, 1).toUpperCase() + itemName.substring(1);
-
-            itemName = formatItemName(itemName);
-            itemName = itemName + " ";
+            itemName = getFormattedItemName(menu.blockentity.getStoredArmadilloData2Value("resource_quality")) + " ";
         }
 
-        if (menu.blockentity.isArmadilloBaby()) {
-            newTooltipText = itemName + "Baby Armadillo";
-        } else {
-            newTooltipText = itemName + "Armadillo";
-        }
+        String armadilloType = menu.blockentity.isArmadilloBaby() ? "Baby Armadillo" : "Armadillo";
 
-        Component tooltipText = Component.literal(newTooltipText);
-
+        Component tooltipText = Component.literal(itemName + armadilloType);
         Component tooltipText2 = CommonComponents.EMPTY;
-
-        Component tooltipText3 = (Component.translatable("tool_tip.resource_armadillo.left_click")
-                .append(Component.literal(newTooltipText).withStyle(ChatFormatting.GRAY))
-                .append(Component.translatable("tool_tip.resource_armadillo.out_of_the_roost")));
+        Component tooltipText3 = Component.translatable("tool_tip.resource_armadillo.left_click")
+                .append(Component.literal(" " + itemName + armadilloType).withStyle(ChatFormatting.GRAY))
+                .append(Component.translatable("tool_tip.resource_armadillo.out_of_the_roost"));
 
         ArmadilloTooltipTest2 = new ComponentTooltip(58, 36, tooltipText, tooltipText2, tooltipText3, 25, 25);
     }
 
 
     private void ResourceArmadilloTooltip() {
-        String newTooltipText;
-        String itemName = "";
+        String itemName = getFormattedItemName(menu.blockentity.getSlotInputItems(4));
 
-        String goingToBeCrafted = menu.blockentity.getSlotInputItems(4).toString();
-
-        goingToBeCrafted = goingToBeCrafted.replaceAll("^\\d+", "");
-
-
-        if (goingToBeCrafted == null || goingToBeCrafted.isEmpty()) {
-            goingToBeCrafted = "";
-        }
-
-        String[] parts = goingToBeCrafted.split(":");
-        itemName = parts.length > 1 ? parts[1] : parts[0];
-
-        itemName = itemName.substring(0, 1).toUpperCase() + itemName.substring(1);
-        itemName = formatItemName(itemName);
-
-        newTooltipText = itemName + " Baby Armadillo";
-
-        Component tooltipText = Component.literal(newTooltipText);
+        Component tooltipText = Component.literal(itemName + " Baby Armadillo");
         Component tooltipText2 = CommonComponents.EMPTY;
-        Component tooltipText3 =(Component.translatable("tool_tip.resource_armadillo.hive_output"));
+        Component tooltipText3 = Component.translatable("tool_tip.resource_armadillo.hive_output");
 
         ResourceArmadilloTooltip = new ComponentTooltip(120, 32, tooltipText, tooltipText2, tooltipText3, 25, 25);
     }
@@ -340,20 +293,6 @@ public class ArmadilloHiveScreen extends AbstractContainerScreen<ArmadilloHiveMe
                         Optional.empty(), pMouseX - x, pMouseY - y);
             }
         }
-    }
-
-    private String formatItemName(String itemName) {
-        String[] words = itemName.split("_");
-        StringBuilder formattedName = new StringBuilder();
-
-        for (String word : words) {
-            if (!word.isEmpty()) {
-                formattedName.append(word.substring(0, 1).toUpperCase()).append(word.substring(1).toLowerCase());
-            }
-            formattedName.append(" ");
-        }
-
-        return formattedName.toString().trim();
     }
 
     @Override
@@ -368,5 +307,37 @@ public class ArmadilloHiveScreen extends AbstractContainerScreen<ArmadilloHiveMe
 
     private boolean isMouseAboveArea(int pMouseX, int pMouseY, int x, int y, int offsetX, int offsetY, int width, int height) {
         return MouseUtil.isMouseOver(pMouseX, pMouseY, x + offsetX, y + offsetY, width, height);
+    }
+
+    private String getFormattedItemName(Object itemSource) {
+        String itemName = "";
+
+        if (itemSource instanceof ItemStack itemStack && !itemStack.isEmpty()) {
+            ResourceLocation itemID = BuiltInRegistries.ITEM.getKey(itemStack.getItem());
+            itemName = itemID.getPath();
+        } else if (itemSource instanceof String str && !str.isEmpty()) {
+            String[] parts = str.split(":");
+            itemName = parts.length > 1 ? parts[1] : parts[0];
+        }
+
+        if (!itemName.isEmpty()) {
+            itemName = itemName.replace("_", " ");
+            itemName = capitalizeWords(itemName);
+        }
+
+        return itemName;
+    }
+
+    private String capitalizeWords(String input) {
+        String[] words = input.split(" ");
+        StringBuilder result = new StringBuilder();
+
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                result.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1)).append(" ");
+            }
+        }
+
+        return result.toString().trim();
     }
 }

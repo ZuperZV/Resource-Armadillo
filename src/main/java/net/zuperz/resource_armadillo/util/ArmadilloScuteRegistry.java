@@ -4,14 +4,19 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
-import net.zuperz.resource_armadillo.item.ModCreativeModeTabs;
-import net.zuperz.resource_armadillo.item.ModItems;
 import net.zuperz.resource_armadillo.item.custom.ArmadilloScuteItem;
-import org.apache.logging.log4j.core.config.plugins.util.PluginRegistry;
 
 import java.util.*;
 
-import static com.mojang.text2speech.Narrator.LOGGER;
+/*
+ *  MIT License
+ *  Copyright (c) 2020 BlakeBr0
+ *
+ *  This code is licensed under the "MIT License"
+ *  https://github.com/BlakeBr0/MysticalCustomization/blob/1.21/LICENSE
+ *
+ *  Modified by: ZuperZ
+ */
 
 public class ArmadilloScuteRegistry {
     private static final ArmadilloScuteRegistry INSTANCE = new ArmadilloScuteRegistry();

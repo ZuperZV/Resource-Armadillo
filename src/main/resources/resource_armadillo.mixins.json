@@ -3,9 +3,15 @@
   "package": "net.zuperz.resource_armadillo.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "TestMixin"
+    "ArmorDyeRecipeMixin",
+    "DyedItemColorMixin",
+    "WolfArmorLayerMixin",
+    "WolfHasArmorMixin",
+    "WolfMixin"
   ],
   "client": [
+    "ItemColorsMixin",
+    "WolfArmorLayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

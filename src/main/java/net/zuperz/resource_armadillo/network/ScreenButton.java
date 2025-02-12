@@ -54,8 +54,6 @@ public record ScreenButton(int buttonID, int x, int y, int z) implements CustomP
             if (level != null && pos != null) {
                 if (level.getBlockEntity(pos) instanceof RoostBlockEntity blockEntity) {
 
-                    System.out.println("Interacting with RoostBlockEntity: " + blockEntity);
-
                     blockEntity.spawnResourceArmadilloFromData(blockEntity, "0.5");
                 }
             }
@@ -63,16 +61,12 @@ public record ScreenButton(int buttonID, int x, int y, int z) implements CustomP
             if (level != null && pos != null) {
                 if (level.getBlockEntity(pos) instanceof ArmadilloHiveBlockEntity blockEntity) {
 
-                    System.out.println("Interacting with ArmadilloHiveBlockEntity: " + blockEntity);
-
                     blockEntity.spawnResourceArmadilloFromData(blockEntity, "0.5", 1);
                 }
             }
         } else if (buttonID == 2) {
             if (level != null && pos != null) {
                 if (level.getBlockEntity(pos) instanceof ArmadilloHiveBlockEntity blockEntity) {
-
-                    System.out.println("Interacting with ArmadilloHiveBlockEntity: " + blockEntity);
 
                     blockEntity.spawnResourceArmadilloFromData(blockEntity, "0.5", 2);
                 }

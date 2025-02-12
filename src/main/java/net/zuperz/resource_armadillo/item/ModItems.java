@@ -22,6 +22,12 @@ public class ModItems {
     public static final DeferredRegister.Items ITEMS =
             DeferredRegister.createItems(ResourceArmadillo.MOD_ID);
 
+    public static final DeferredItem<Item> RAW_CHROMIUM = ITEMS.registerItem("raw_chromium",
+            Item::new, (new Item.Properties()));
+
+    public static final DeferredItem<Item> CHROMIUM_INGOT = ITEMS.registerItem("chromium_ingot",
+            Item::new, (new Item.Properties()));
+
     public static final DeferredItem<Item> IRON_BRUSH = ITEMS.registerItem("iron_brush",
             BrushItem::new, (new Item.Properties().durability(94)));
 
@@ -34,15 +40,14 @@ public class ModItems {
     public static final DeferredItem<Item> ARMADILLO_TAB = ITEMS.register("armadillo_tab",
             () -> new RainbowItem(new Item.Properties()));
 
+    public static void register(IEventBus eventBus) {
+        ITEMS.register(eventBus);
+    }
+
     @SubscribeEvent
     public static void onRegisterItems(RegisterEvent event) {
         event.register(Registries.ITEM, registry -> {
             ArmadilloScuteRegistry.getInstance().onRegisterItems(registry);
         });
-    }
-
-    public static void register(IEventBus eventBus) {
-        ITEMS.register(eventBus);
-        eventBus.addListener(ModItems::onRegisterItems);
     }
 }

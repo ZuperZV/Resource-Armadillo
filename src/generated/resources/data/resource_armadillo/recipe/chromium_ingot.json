@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "resource_armadillo:chromium_block"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "id": "resource_armadillo:chromium_ingot"
+  }
+}

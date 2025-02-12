@@ -260,7 +260,6 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
                 RoostRecipe recipe = alcheRecipeOptional.get().value();
                 ItemStack result = recipe.getResultItem(level.registryAccess());
 
-                System.out.println("result from goingToBeCrafted: " + result.copy());
                 inputItems.setStackInSlot(4, result.copy());
             }
         }

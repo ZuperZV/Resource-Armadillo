@@ -13,8 +13,11 @@ import javax.annotation.Nullable;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -80,7 +83,6 @@ public class ResourceArmadilloEntity extends Animal {
     Random pRandom = new Random();
 
     private double productionSpeed = (generateProductionSpeed(pRandom::nextDouble));
-    public ItemStack resource = Items.ARMADILLO_SCUTE.getDefaultInstance();
     private double productionEfficiency = (generateproductionEfficiency(pRandom::nextDouble));
 
     private static final EntityDataAccessor<ArmadilloState> ARMADILLO_STATE = SynchedEntityData.defineId(
@@ -88,6 +90,8 @@ public class ResourceArmadilloEntity extends Animal {
 
     private static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(
             ResourceArmadilloEntity.class, EntityDataSerializers.INT);
+
+    public ItemStack resource = Items.ARMADILLO_SCUTE.getDefaultInstance();
 
 
     private long inStateTicks = 0L;
@@ -119,8 +123,6 @@ public class ResourceArmadilloEntity extends Animal {
         super.tick();
 
         updateVariantFromResourceNotClient();
-
-        System.out.println("resource: " + resource);
 
         if (this.level().isClientSide()) {
             this.setupAnimationStates();
@@ -239,13 +241,25 @@ public class ResourceArmadilloEntity extends Animal {
     }
 
     public ArmadilloScuteType getVariant() {
-        return ArmadilloScuteRegistry.getInstance().getArmadilloScuteTypes().get(this.getTypeVariant());
+        List<ArmadilloScuteType> scuteTypes = ArmadilloScuteRegistry.getInstance().getArmadilloScuteTypes().stream().filter(ArmadilloScuteType::isEnabled).toList();
+        int index = this.getTypeVariant();
+
+        if (index < 0 || index >= scuteTypes.size()) {
+            return scuteTypes.get(0);
+        }
+        return scuteTypes.get(index);
     }
 
     public void setVariant(ArmadilloScuteType variant) {
-        int index = ArmadilloScuteRegistry.getInstance().getArmadilloScuteTypes().indexOf(variant);
+        List<ArmadilloScuteType> scuteTypes = ArmadilloScuteRegistry.getInstance().getArmadilloScuteTypes().stream().filter(ArmadilloScuteType::isEnabled).toList();
+        int index = scuteTypes.indexOf(variant);
+
+        if (index == -1) {
+            index = 0;
+        }
         this.entityData.set(VARIANT, index);
     }
+
 
     @Override
     @Nullable
@@ -265,7 +279,7 @@ public class ResourceArmadilloEntity extends Animal {
             ResourceLocation scuteLocation = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, scuteName);
             Item scuteItem = BuiltInRegistries.ITEM.get(scuteLocation);
             if (scuteItem != null) {
-                this.resource = new ItemStack(scuteItem);
+                setResource(new ItemStack(scuteItem));
             }
         }
 
@@ -431,8 +445,8 @@ public class ResourceArmadilloEntity extends Animal {
         super.addAdditionalSaveData(pCompound);
         pCompound.putString("state", this.getState().getSerializedName());
 
-        System.out.println("resource_quality: " + getResource().toString());
-        pCompound.putString("resource_quality", (getResource().toString()));
+        pCompound.putString("resource_quality", (this.resource.toString()));
+        System.out.println("resource_quality test: " + (this.resource.toString()));
 
         pCompound.putBoolean("armadillo_part", this.armadillo_part);
 
@@ -453,7 +467,8 @@ public class ResourceArmadilloEntity extends Animal {
             String resourceItem = pCompound.getString("resource_quality");
             String[] parts = resourceItem.split(" ", 2);
             String cleanedResource = parts.length > 1 ? parts[1] : parts[0];
-            System.out.println("readAdditionalSaveData: " + BuiltInRegistries.ITEM.get(ResourceLocation.parse(cleanedResource)).getDefaultInstance());
+            System.out.println("resource_quality 2Text: " + cleanedResource);
+            System.out.println("resource_quality 3Text: " +  BuiltInRegistries.ITEM.get(ResourceLocation.parse(cleanedResource)).getDefaultInstance());
             this.resource = BuiltInRegistries.ITEM.get(ResourceLocation.parse(cleanedResource)).getDefaultInstance();
         }
 
@@ -524,10 +539,6 @@ public class ResourceArmadilloEntity extends Animal {
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         } else if (itemstack.is(Items.SHEARS) && this.shearOffScute()) {
             itemstack.hurtAndBreak(5, pPlayer, getSlotForHand(pHand));
-        } else if (!itemstack.isEmpty() && !itemstack.is(ItemTags.ARMADILLO_FOOD) && !(itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH) && !(itemstack.is(Items.SHEARS)))) {
-            setResource(itemstack);
-            pPlayer.sendSystemMessage(Component.literal("Item used in setResource: " + itemstack.getDisplayName().getString()));
-            pPlayer.sendSystemMessage(Component.literal("scuteCount: " + scuteCount));
         } else if (itemstack.isEmpty() && !(itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH) && !(itemstack.is(Items.SHEARS)))) {
             pPlayer.sendSystemMessage(Component.literal("resource is: " + getResource().getDisplayName().getString()));
             pPlayer.sendSystemMessage(Component.literal("scuteCount is: " + scuteCount));
@@ -639,7 +650,6 @@ public class ResourceArmadilloEntity extends Animal {
     }
 
     public ItemStack getResource() {
-        System.out.println("resource: " + resource);
         return this.resource;
     }
 

@@ -7,6 +7,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
 import net.zuperz.resource_armadillo.block.ModBlocks;
 import net.zuperz.resource_armadillo.block.entity.custom.ArmadilloHiveBlockEntity;
+import net.zuperz.resource_armadillo.block.entity.custom.CentrifugeBlockEntity;
 import net.zuperz.resource_armadillo.block.entity.custom.RoostBlockEntity;
 
 import java.util.function.Supplier;
@@ -24,6 +25,9 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("armadillo_hive", () -> BlockEntityType.Builder.of(
                     ArmadilloHiveBlockEntity::new, ModBlocks.ARMADILLO_HIVE.get()).build(null));
 
+    public static final Supplier<BlockEntityType<CentrifugeBlockEntity>> CENTRIFUGE_BLOCK_ENTITY =
+            BLOCK_ENTITIES.register("centrifuge_be", () -> BlockEntityType.Builder.of(
+                    CentrifugeBlockEntity::new, ModBlocks.CENTRIFUGE.get()).build(null));
 
 
     public static void register(IEventBus eventBus) {

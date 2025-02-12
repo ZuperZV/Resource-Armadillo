@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "resource_armadillo:block/chromium_block"
+  }
+}

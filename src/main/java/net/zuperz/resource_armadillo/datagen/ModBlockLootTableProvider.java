@@ -22,6 +22,7 @@ import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.zuperz.resource_armadillo.block.ModBlocks;
+import net.zuperz.resource_armadillo.item.ModItems;
 
 import java.util.Set;
 
@@ -34,6 +35,14 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     protected void generate() {
         dropSelf(ModBlocks.ARMADILLO_HIVE.get());
         dropSelf(ModBlocks.ROOST.get());
+
+        dropSelf(ModBlocks.CHROMIUM_BLOCK.get());
+        dropSelf(ModBlocks.CENTRIFUGE.get());
+
+        this.add(ModBlocks.CHROMIUM_ORE.get(),
+                block -> createMultipleOreDrops(ModBlocks.CHROMIUM_ORE.get(), ModItems.RAW_CHROMIUM.get(), 1, 3));
+        this.add(ModBlocks.CHROMIUM_DEEPSLATE_ORE.get(),
+                block -> createMultipleOreDrops(ModBlocks.CHROMIUM_DEEPSLATE_ORE.get(), ModItems.RAW_CHROMIUM.get(), 2, 4));
     }
 
     protected LootTable.Builder createMultipleOreDrops(Block pBlock, Item item, float minDrops, float maxDrops) {

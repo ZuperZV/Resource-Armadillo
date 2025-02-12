@@ -1,9 +1,14 @@
 package net.zuperz.resource_armadillo.util;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.AnimalArmorItem;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
+import net.zuperz.resource_armadillo.item.custom.ArmadilloAnimalArmorItem;
+import net.zuperz.resource_armadillo.item.custom.ArmadilloEssenceScuteItem;
 import net.zuperz.resource_armadillo.item.custom.ArmadilloScuteItem;
 
 import java.util.*;
@@ -55,9 +60,9 @@ public class ArmadilloScuteRegistry {
     }
 
     public void onRegisterItems(RegisterEvent.RegisterHelper<Item> registry) {
-        var ArmadilloScuteTypes = this.ArmadilloScuteTypes.values();
+        var armadilloScuteTypes = this.ArmadilloScuteTypes.values();
 
-        ArmadilloScuteTypes.stream().filter(ArmadilloScuteType::shouldRegisterEssenceItem).forEach(scute -> {
+        armadilloScuteTypes.stream().filter(ArmadilloScuteType::shouldRegisterEssenceItem).forEach(scute -> {
             var essence = scute.getEssenceItem();
             if (essence == null) {
                 var defaultEssence = new ArmadilloScuteItem(scute);
@@ -66,8 +71,25 @@ public class ArmadilloScuteRegistry {
                 setAllowRegistration(true);
             }
 
-            var id = ResourceLocation.fromNamespaceAndPath((ResourceArmadillo.MOD_ID), (scute.getNameWithSuffix("scute")));
-            registry.register(id, essence);
+            var scuteId = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, scute.getNameWithSuffix("scute"));
+            registry.register(scuteId, essence);
+
+            var essenceItem = new ArmadilloEssenceScuteItem(scute);
+            var essenceId = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, scute.getNameWithSuffix("essence"));
+            registry.register(essenceId, essenceItem);
+
+
+            var armorItem = new ArmadilloAnimalArmorItem(
+                    ArmorMaterials.ARMADILLO,
+                    scute,
+                    ArmadilloAnimalArmorItem.BodyType.CANINE,
+                    true,
+                    new Item.Properties().durability(ArmorItem.Type.BODY.getDurability(5)),
+                    scute
+            );
+
+            var armorId = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, scute.getNameWithSuffix("armor"));
+            registry.register(armorId, armorItem);
         });
     }
 }

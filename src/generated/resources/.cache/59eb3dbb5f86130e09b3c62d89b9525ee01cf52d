@@ -1,3 +1,7 @@
-// 1.21	2024-12-14T19:37:12.0680661	Loot Tables
+// 1.21	2025-02-10T21:04:29.3418046	Loot Tables
 f9046d3f1b14f765b76837f997fc28ef365536d9 data/resource_armadillo/loot_table/blocks/armadillo_hive.json
+8a2a89fdf249ac845d5291ead6ebb5325c3f80f2 data/resource_armadillo/loot_table/blocks/centrifuge.json
+a84b7b6f70a4d9a728414ea03982ad59eec2b600 data/resource_armadillo/loot_table/blocks/chromium_block.json
+371d83459152654c039d3618e632256296e6c0ad data/resource_armadillo/loot_table/blocks/chromium_deepslate_ore.json
+ae6b6651db5bcaad5fdf16ddf731ddbc2f6b8b51 data/resource_armadillo/loot_table/blocks/chromium_ore.json
 4eaf1687a8951c3a82a514ca8fb059af28c0234c data/resource_armadillo/loot_table/blocks/roost.json

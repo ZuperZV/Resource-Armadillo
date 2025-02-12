@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "minecraft:sand"
+  },
+  "ingredient_2": {
+    "item": "minecraft:gravel"
+  },
+  "output": {
+    "item": "resource_armadillo:sand_scute"
+  }
+}

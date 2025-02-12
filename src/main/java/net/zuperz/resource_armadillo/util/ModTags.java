@@ -14,7 +14,7 @@ public class ModTags {
 
     public static class Items {
 
-        //public static final TagKey<Item> SOUL_SHARD = tag("soul_shard");
+        public static final TagKey<Item> WOOLF_ARMOR = tag("wolf_armor");
 
         private static TagKey<Item> tag(String name) {
             return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, name));

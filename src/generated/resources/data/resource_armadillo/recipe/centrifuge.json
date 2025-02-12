@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "resource_armadillo:chromium_ingot"
+    },
+    "B": {
+      "item": "resource_armadillo:chromium_block"
+    },
+    "C": {
+      "item": "minecraft:glass"
+    },
+    "D": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "pattern": [
+    "A A",
+    "ACA",
+    "DBD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "resource_armadillo:centrifuge"
+  }
+}

@@ -22,14 +22,15 @@ public class ModBlockTagProvider extends BlockTagsProvider {
     protected void addTags(HolderLookup.Provider pProvider) {
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 .add(ModBlocks.ROOST.get())
-                .add(ModBlocks.ARMADILLO_HIVE.get());
+                .add(ModBlocks.ARMADILLO_HIVE.get())
+                .add(ModBlocks.CHROMIUM_ORE.get())
+                .add(ModBlocks.CHROMIUM_DEEPSLATE_ORE.get());
 
         this.tag(BlockTags.NEEDS_STONE_TOOL)
                 .add(ModBlocks.ROOST.get())
-                .add(ModBlocks.ARMADILLO_HIVE.get());
-
-        this.tag(BlockTags.NEEDS_STONE_TOOL)
-                .add(ModBlocks.ARMADILLO_HIVE.get());
+                .add(ModBlocks.ARMADILLO_HIVE.get())
+                .add(ModBlocks.CHROMIUM_ORE.get())
+                .add(ModBlocks.CHROMIUM_DEEPSLATE_ORE.get());
 
         this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(ModBlocks.ARMADILLO_HIVE.get());

@@ -39,34 +39,15 @@ public class RoostBlock extends Block implements EntityBlock {
     public static BooleanProperty ARMADILLO_DATA = BooleanProperty.create("armadillo_data");
 
     private static final VoxelShape SHAPE_NORTH = Shapes.or(
-            // First element
             box(0.75, 4, 0.75, 15.25, 6, 15.25),
-
-            // Second element
             box(2.0, 6, 1.5, 14.0, 8, 14.0),
-
-            // Third element
             box(13.75, 6, 2.0, 14.75, 13, 14.0),
-
-            // Fourth element
             box(1.25, 6, 2.25, 2.25, 13, 14.25),
-
-            // Fifth element
             box(1.75, 6, 13.75, 13.75, 14, 14.75),
-
-            // Sixth element
             box(1.0, 6, 1.0, 3.0, 15, 3.0),
-
-            // Seventh element
             box(13.0, 6, 13.0, 15.0, 15, 15.0),
-
-            // Eighth element
             box(1.0, 6, 13.25, 3.0, 15, 15.25),
-
-            // Ninth element
             box(13.0, 6, 1.0, 15.0, 15, 3.0),
-
-            // Tenth element (the base)
             box(0.0, 0, 0.0, 16.0, 4, 16.0)
     );
 
@@ -75,8 +56,6 @@ public class RoostBlock extends Block implements EntityBlock {
     private static final VoxelShape SHAPE_WEST = rotateShape(Direction.NORTH, Direction.WEST, SHAPE_NORTH);
 
     //* Rescource Armadillo *//
-
-
 
     public RoostBlock(Properties properties) {
         super(Properties.of());

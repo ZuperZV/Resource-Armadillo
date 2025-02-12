@@ -1,25 +1,47 @@
 {
   "creativetab.resource_armadillo.resource_armadillo_tab": "Resource Armadillo",
 
-  "item.minecraft.brush": "Copper Brush",
-  "item.resource_armadillo.iron_brush": "Iron Brush",
-
-  "item.resource_armadillo.diamond_armadillo_scute": "Diamond Armadillo Scute",
-  "item.resource_armadillo.resource_armadillo_spawn_egg": "Resource Armadillo Spawn Egg",
-  "item.resource_armadillo.armadillo_part": "Armadillo Part",
-
-  "armadillo_scute.resource_armadillo.emerald": "Emerald",
-  "armadillo_scute.resource_armadillo.diamond": "Diamond",
-  "armadillo_scute.resource_armadillo.stone": "Stone",
-  "armadillo_scute.resource_armadillo.cobblestone": "Cobblestone",
-  "armadillo_scute.resource_armadillo.flint": "Flint",
-  "armadillo_scute.resource_armadillo.coal": "Coal",
-
-  "block.resource_armadillo.roost": "Roost",
-  "block.resource_armadillo.armadillo_hive": "Armadillo Hive",
-
   "tool_tip.resource_armadillo.left_click": "§8Left-click to send ",
   "tool_tip.resource_armadillo.out_of_the_roost": " §8out of the Roost!",
   "tool_tip.resource_armadillo.hive_output": "§8This is the Output",
-  "item.resource_armadillo.resource_armadillo_scute": "Armadillo Scute"
+
+
+
+  "item.minecraft.brush": "Copper Brush",
+  "item.resource_armadillo.iron_brush": "Iron Brush",
+  "item.resource_armadillo.resource_armadillo_spawn_egg": "Resource Armadillo Spawn Egg",
+  "item.resource_armadillo.armadillo_part": "Armadillo Part",
+  "item.resource_armadillo.chromium_ingot": "Chromium Ingot",
+  "item.resource_armadillo.raw_chromium": "Raw Chromium",
+
+  "block.resource_armadillo.chromium_block": "Block of Chromium",
+  "block.resource_armadillo.chromium_deepslate_ore": "Chromium Deepslate Ore",
+  "block.resource_armadillo.chromium_ore": "Chromium Ore",
+  "block.resource_armadillo.roost": "Roost",
+  "block.resource_armadillo.armadillo_hive": "Armadillo Hive",
+  "block.resource_armadillo.centrifuge": "Centrifuge",
+
+
+
+  "item.resource_armadillo.resource_armadillo_scute": "Armadillo Scute",
+  "item.resource_armadillo.resource_armadillo_essence_scute": "Armadillo Essence",
+  "item.resource_armadillo.resource_armadillo_armor_scute": "Wolf Armor",
+
+
+  "armadillo_scute.resource_armadillo.dirt": "Dirt",
+  "armadillo_scute.resource_armadillo.cobblestone": "Cobblestone",
+  "armadillo_scute.resource_armadillo.flint": "Flint",
+  "armadillo_scute.resource_armadillo.stone": "Stone",
+  "armadillo_scute.resource_armadillo.sand": "Sand",
+  "armadillo_scute.resource_armadillo.clay": "Clay",
+  "armadillo_scute.resource_armadillo.netherrack": "Netherrack",
+
+  "armadillo_scute.resource_armadillo.coal": "Coal",
+  "armadillo_scute.resource_armadillo.iron": "Iron",
+  "armadillo_scute.resource_armadillo.diamond": "Diamond",
+  "armadillo_scute.resource_armadillo.quartz": "Quartz",
+
+  "armadillo_scute.resource_armadillo.chromium": "Chromium",
+  "armadillo_scute.resource_armadillo.emerald": "Emerald",
+  "armadillo_scute.resource_armadillo.redstone": "Redstone"
 }

@@ -80,6 +80,8 @@ public class BreedingRecipe implements Recipe<RecipeInput> {
         NonNullList<Ingredient> ingredients = NonNullList.createWithCapacity(4);
         ingredients.add(0, food_1);
         ingredients.add(1, food_2);
+        ingredients.add(2, armadillo_ingredient_1);
+        ingredients.add(3, armadillo_ingredient_2);
         return ingredients;
     }
     @Override

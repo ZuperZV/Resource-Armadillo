@@ -4,6 +4,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.zuperz.resource_armadillo.item.ModArmadilloScutes;
 
 import java.util.function.Supplier;
 
@@ -21,22 +22,26 @@ public class ArmadilloScuteType {
 
     private final ResourceLocation id;
     private ResourceLocation texture;
+    private ResourceLocation armorTexture;
     private Component displayName;
     private Supplier<? extends Item> essence;
-    private Ingredient craftingMaterial;
     private boolean enabled;
     private boolean registerEssenceItem;
 
-    public ArmadilloScuteType(ResourceLocation id, ResourceLocation texture, Ingredient craftingMaterial, boolean enabled) {
+    public ArmadilloScuteType(ResourceLocation id, ResourceLocation texture, ResourceLocation armorTexture, boolean enabled) {
         this.id = id;
-        this.craftingMaterial = craftingMaterial;
         this.enabled = enabled;
         this.registerEssenceItem = true;
         this.texture = texture;
+        this.armorTexture = armorTexture;
     }
 
     public ResourceLocation getTexture() {
         return this.texture;
+    }
+
+    public ResourceLocation getArmorTexture() {
+        return this.armorTexture;
     }
 
     public ArmadilloScuteType setTexture(ResourceLocation texture) {
@@ -87,19 +92,6 @@ public class ArmadilloScuteType {
 
     public boolean shouldRegisterEssenceItem() {
         return this.registerEssenceItem;
-    }
-
-    public Ingredient getCraftingMaterial() {
-        return this.craftingMaterial;
-    }
-
-    public ArmadilloScuteType setCraftingMaterial(Ingredient ingredient) {
-        this.craftingMaterial = ingredient;
-        return this;
-    }
-
-    public Ingredient getIngredient() {
-        return this.craftingMaterial;
     }
 
     public boolean isEnabled() {

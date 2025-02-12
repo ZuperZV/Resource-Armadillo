@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_iron_scute": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:iron_scute"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_armadillo:diamond_scutefrom_hive_breeding"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_iron_scute"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_armadillo:diamond_scutefrom_hive_breeding"
+    ]
+  }
+}

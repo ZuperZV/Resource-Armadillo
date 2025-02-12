@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 0.1,
+  "ingredient": {
+    "item": "resource_armadillo:raw_chromium"
+  },
+  "result": {
+    "count": 1,
+    "id": "resource_armadillo:chromium_ingot"
+  }
+}

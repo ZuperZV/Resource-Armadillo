@@ -1,0 +1,9 @@
+{
+  "type": "resource_armadillo:centrifuge",
+  "ingredient": {
+    "item": "resource_armadillo:cobblestone_scute"
+  },
+  "output": {
+    "item": "resource_armadillo:cobblestone_essence"
+  }
+}

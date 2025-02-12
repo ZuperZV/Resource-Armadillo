@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_dirt_armor": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:dirt_scute"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_armadillo:dirt_armor_crafted_from_dirt_scute"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_dirt_armor"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_armadillo:dirt_armor_crafted_from_dirt_scute"
+    ]
+  }
+}

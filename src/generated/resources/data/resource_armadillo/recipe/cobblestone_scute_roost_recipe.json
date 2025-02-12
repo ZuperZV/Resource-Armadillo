@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "minecraft:cobblestone"
+  },
+  "ingredient_2": {
+    "item": "minecraft:andesite"
+  },
+  "output": {
+    "item": "resource_armadillo:cobblestone_scute"
+  }
+}

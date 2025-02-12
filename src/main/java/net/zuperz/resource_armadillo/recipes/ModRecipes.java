@@ -29,6 +29,9 @@ public class ModRecipes {
     public static final Supplier<RecipeType<BreedingRecipe>> BREEDING_ARMADILLO_RECIPE_TYPE =
             RECIPE_TYPES.register("breeding", () -> BreedingRecipe.Type.INSTANCE);
 
+    public static final Supplier<RecipeType<CentrifugeRecipe>> CENTRIFUGE_RECIPE_TYPE =
+            RECIPE_TYPES.register("centrifuge", () -> CentrifugeRecipe.Type.INSTANCE);
+
 
     public static final Supplier<RecipeSerializer<RoostRecipe>> ATOMIC_OVEN_SERIALIZER =
             SERIALIZERS.register("roost", () -> RoostRecipe.Serializer.INSTANCE);
@@ -38,4 +41,7 @@ public class ModRecipes {
 
     public static final Supplier<RecipeSerializer<BreedingRecipe>> BREEDING_ARMADILLO_SERIALIZER =
             SERIALIZERS.register("breeding", () -> BreedingRecipe.Serializer.INSTANCE);
+
+    public static final Supplier<RecipeSerializer<CentrifugeRecipe>> CENTRIFUGE_SERIALIZER =
+            SERIALIZERS.register("centrifuge", () -> CentrifugeRecipe.Serializer.INSTANCE);
 }

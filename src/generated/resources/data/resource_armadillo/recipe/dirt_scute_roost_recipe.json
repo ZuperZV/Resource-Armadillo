@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "minecraft:dirt"
+  },
+  "ingredient_2": {
+    "item": "minecraft:wheat_seeds"
+  },
+  "output": {
+    "item": "resource_armadillo:dirt_scute"
+  }
+}

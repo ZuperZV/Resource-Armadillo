@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_diamond_armor": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:diamond_scute"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_armadillo:diamond_armor_crafted_from_diamond_scute"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_diamond_armor"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_armadillo:diamond_armor_crafted_from_diamond_scute"
+    ]
+  }
+}

@@ -7,6 +7,7 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.zuperz.resource_armadillo.block.ModBlocks;
 import net.zuperz.resource_armadillo.block.entity.ModBlockEntities;
+import net.zuperz.resource_armadillo.block.entity.renderer.CentrifugeBlockEntityRenderer;
 import net.zuperz.resource_armadillo.block.entity.renderer.RoostBlockEntityRenderer;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ModEntities;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
@@ -25,7 +26,6 @@ import net.zuperz.resource_armadillo.screen.ArmadilloHiveScreen;
 import net.zuperz.resource_armadillo.screen.RoostScreen;
 import net.zuperz.resource_armadillo.screen.slot.ModMenuTypes;
 import net.zuperz.resource_armadillo.util.ArmadilloScuteRegistry;
-import net.zuperz.resource_armadillo.util.ArmadilloScuteType;
 import org.slf4j.Logger;import com.mojang.logging.LogUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -67,9 +67,6 @@ public class ResourceArmadillo
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerNetworking);
 
-        ArmadilloScuteRegistry registry = ArmadilloScuteRegistry.getInstance();
-        ModArmadilloScutes.registerAll(registry);
-
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
 
@@ -86,6 +83,10 @@ public class ResourceArmadillo
 
         ResourceEntityDataSerializers.register(modEventBus);
         ResourceSensorTypes.register(modEventBus);
+
+        ArmadilloScuteRegistry registry = ArmadilloScuteRegistry.getInstance();
+        ModArmadilloScutes.registerAll(registry);
+        modEventBus.addListener(ModItems::onRegisterItems);
 
         NeoForge.EVENT_BUS.register(this);
     }
@@ -110,7 +111,6 @@ public class ResourceArmadillo
 
         @SubscribeEvent
         public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-
             event.registerLayerDefinition(ModModelLayers.RESOURCE_ARMADILLO, ResourceArmadilloModel::createBodyLayer);
         }
 
@@ -122,6 +122,7 @@ public class ResourceArmadillo
         @SubscribeEvent
         public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
             event.registerBlockEntityRenderer(ModBlockEntities.ROOST_BLOCK_ENTITY.get(), RoostBlockEntityRenderer::new);
+            event.registerBlockEntityRenderer(ModBlockEntities.CENTRIFUGE_BLOCK_ENTITY.get(), CentrifugeBlockEntityRenderer::new);
         }
 
         @SubscribeEvent

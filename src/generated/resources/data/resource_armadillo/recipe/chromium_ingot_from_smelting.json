@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 300,
+  "experience": 0.2,
+  "ingredient": {
+    "item": "resource_armadillo:raw_chromium"
+  },
+  "result": {
+    "count": 1,
+    "id": "resource_armadillo:chromium_ingot"
+  }
+}

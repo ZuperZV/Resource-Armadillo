@@ -34,12 +34,21 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.RESOURCE_ARMADILLO_SPAWN_EGG.get());
                         pOutput.accept(Items.ARMADILLO_SPAWN_EGG);
                         pOutput.accept(Items.SPIDER_EYE);
+
                         pOutput.accept(ModBlocks.ROOST.get());
                         pOutput.accept(ModBlocks.ARMADILLO_HIVE.get());
+                        pOutput.accept(ModBlocks.CHROMIUM_ORE.get());
+                        pOutput.accept(ModBlocks.CHROMIUM_DEEPSLATE_ORE.get());
+                        pOutput.accept(ModItems.RAW_CHROMIUM.get());
+                        pOutput.accept(ModItems.CHROMIUM_INGOT.get());
+                        pOutput.accept(ModBlocks.CHROMIUM_BLOCK.get());
+                        pOutput.accept(ModBlocks.CENTRIFUGE.get());
+
                         pOutput.accept(Items.BRUSH);
                         pOutput.accept(ModItems.IRON_BRUSH.get());
                         pOutput.accept(Items.ARMADILLO_SCUTE);
                         pOutput.accept(ModItems.ARMADILLO_PART.get());
+                        pOutput.accept(Items.WOLF_ARMOR);
 
                         ArmadilloScuteRegistry registry = ArmadilloScuteRegistry.getInstance();
                         for (var scute : registry.getArmadilloScuteTypes()) {
@@ -49,6 +58,20 @@ public class ModCreativeModeTabs {
                                 Item scuteItem = BuiltInRegistries.ITEM.get(scuteLocation);
                                 if (scuteItem != null) {
                                     pOutput.accept(scuteItem);
+                                }
+
+                                String essenceName = scute.getName() + "_essence";
+                                ResourceLocation essenceLocation = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, essenceName);
+                                Item essenceItem = BuiltInRegistries.ITEM.get(essenceLocation);
+                                if (essenceItem != null) {
+                                    pOutput.accept(essenceItem);
+                                }
+
+                                String armorName = scute.getName() + "_armor";
+                                ResourceLocation armorLocation = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, armorName);
+                                Item armorItem = BuiltInRegistries.ITEM.get(armorLocation);
+                                if (armorItem != null) {
+                                    pOutput.accept(armorItem);
                                 }
                             }
                         }

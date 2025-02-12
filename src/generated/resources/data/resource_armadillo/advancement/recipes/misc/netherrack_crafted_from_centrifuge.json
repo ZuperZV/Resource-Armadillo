@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_netherrack_scute": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:netherrack_scute"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_armadillo:netherrack_crafted_from_centrifuge"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_netherrack_scute"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_armadillo:netherrack_crafted_from_centrifuge"
+    ]
+  }
+}

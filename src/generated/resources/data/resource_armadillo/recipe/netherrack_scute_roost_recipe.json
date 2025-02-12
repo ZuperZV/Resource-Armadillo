@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "minecraft:netherrack"
+  },
+  "ingredient_2": {
+    "item": "minecraft:nether_wart"
+  },
+  "output": {
+    "item": "resource_armadillo:netherrack_scute"
+  }
+}

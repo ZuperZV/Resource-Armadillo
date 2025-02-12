@@ -52,7 +52,6 @@ public class RoostScreen extends AbstractContainerScreen<RoostMenu> {
         Button button_1 = new PlainTextButton(this.leftPos + 46, this.topPos + 11, 25, 25, Component.translatable(""), e -> {
             BlockPos pos = this.menu.blockentity.getBlockPos();
             PacketDistributor.sendToServer(new ScreenButton(0, pos.getX(), pos.getY(), pos.getZ()));
-            System.out.println("Button clicked in RoostScreen!");
         }, this.font);
         this.addRenderableWidget(button_1);
 

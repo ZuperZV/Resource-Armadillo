@@ -57,14 +57,12 @@ public class ArmadilloHiveScreen extends AbstractContainerScreen<ArmadilloHiveMe
         Button button_1 = new PlainTextButton(this.leftPos + 13, this.topPos + 11, 25, 25, Component.translatable(""), e -> {
             BlockPos pos = this.menu.blockentity.getBlockPos();
             PacketDistributor.sendToServer(new ScreenButton(1, pos.getX(), pos.getY(), pos.getZ()));
-            System.out.println("Button 1 clicked in Hive Screen!");
         }, this.font);
         this.addRenderableWidget(button_1);
 
         Button button_2 = new PlainTextButton(this.leftPos + 46, this.topPos + 11, 25, 25, Component.translatable(""), e -> {
             BlockPos pos = this.menu.blockentity.getBlockPos();
             PacketDistributor.sendToServer(new ScreenButton(2, pos.getX(), pos.getY(), pos.getZ()));
-            System.out.println("Button 2 clicked in Hive Screen!");
         }, this.font);
         this.addRenderableWidget(button_2);
 
@@ -81,7 +79,6 @@ public class ArmadilloHiveScreen extends AbstractContainerScreen<ArmadilloHiveMe
 
         renderArmadilloAreaTooltip(guiGraphics, pMouseX, pMouseY, x, y);
         renderArmadilloArea2Tooltip(guiGraphics, pMouseX, pMouseY, x, y);
-
         renderResourceArmadilloAreaTooltip(guiGraphics, pMouseX, pMouseY, x, y);
     }
 
@@ -125,7 +122,6 @@ public class ArmadilloHiveScreen extends AbstractContainerScreen<ArmadilloHiveMe
             }
         }
 
-
         if (level != null) {
             if (!menu.blockentity.isArmadilloDataEmpty()) {
                 int size = 20;
@@ -151,6 +147,7 @@ public class ArmadilloHiveScreen extends AbstractContainerScreen<ArmadilloHiveMe
 
                         if (armadillo instanceof ResourceArmadilloEntity resourceArmadillo) {
                             resourceArmadillo.load(armadilloData);
+                            resourceArmadillo.updateVariantFromResource();
                         }
                     } else {
                         armadillo = EntityType.ARMADILLO.create(level);
@@ -186,7 +183,6 @@ public class ArmadilloHiveScreen extends AbstractContainerScreen<ArmadilloHiveMe
                 try {
                     if (menu.blockentity.isArmadilloData2AResourceArmadillo()) {
                         CompoundTag armadilloData = TagParser.parseTag(menu.blockentity.getStoredArmadilloData2());
-                        System.out.println("armadilloData data: " + armadilloData);
 
                         ListTag rotationTag = new ListTag();
                         rotationTag.add(FloatTag.valueOf(0.0f));
@@ -199,6 +195,7 @@ public class ArmadilloHiveScreen extends AbstractContainerScreen<ArmadilloHiveMe
 
                         if (armadillo instanceof ResourceArmadilloEntity resourceArmadillo) {
                             resourceArmadillo.load(armadilloData);
+                            resourceArmadillo.updateVariantFromResource();
                         }
                     } else {
                         armadillo = EntityType.ARMADILLO.create(level);

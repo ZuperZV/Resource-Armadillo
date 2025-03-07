@@ -28,6 +28,21 @@ public class ModItemTagProvider extends ItemTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider pProvider) {
+        this.tag(Tags.Items.TOOLS_BRUSH)
+                .add(Items.BRUSH)
+                .add(ModItems.GOLD_BRUSH.get())
+                .add(ModItems.IRON_BRUSH.get())
+                .add(ModItems.CHROMIUM_BRUSH.get())
+                .add(ModItems.DIAMOND_BRUSH.get())
+                .add(ModItems.NETHERITE_BRUSH.get());
+
+        this.tag(ItemTags.DURABILITY_ENCHANTABLE)
+                .add(Items.BRUSH,
+                        ModItems.GOLD_BRUSH.get(),
+                        ModItems.IRON_BRUSH.get(),
+                        ModItems.CHROMIUM_BRUSH.get(),
+                        ModItems.DIAMOND_BRUSH.get(),
+                        ModItems.NETHERITE_BRUSH.get());
 
         this.tag(Tags.Items.INGOTS)
                 .add(ModItems.CHROMIUM_INGOT.get());

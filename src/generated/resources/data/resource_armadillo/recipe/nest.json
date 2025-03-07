@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:hay_block"
+    },
+    "C": {
+      "tag": "minecraft:logs"
+    },
+    "D": {
+      "tag": "c:gems"
+    },
+    "E": {
+      "item": "resource_armadillo:armadillo_hive"
+    }
+  },
+  "pattern": [
+    "D D",
+    "BDB",
+    "CEC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "resource_armadillo:nest"
+  }
+}

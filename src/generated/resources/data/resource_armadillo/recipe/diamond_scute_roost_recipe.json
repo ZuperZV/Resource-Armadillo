@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "minecraft:diamond"
+  },
+  "ingredient_2": {
+    "item": "resource_armadillo:iron_scute"
+  },
+  "output": {
+    "item": "resource_armadillo:diamond_scute"
+  }
+}

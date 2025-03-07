@@ -4,7 +4,7 @@
     "item": "minecraft:cobblestone"
   },
   "ingredient_2": {
-    "item": "minecraft:andesite"
+    "item": "resource_armadillo:dirt_scute"
   },
   "output": {
     "item": "resource_armadillo:cobblestone_scute"

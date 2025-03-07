@@ -1,6 +1,7 @@
 package net.zuperz.resource_armadillo;
 
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
@@ -8,6 +9,8 @@ import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.zuperz.resource_armadillo.block.ModBlocks;
 import net.zuperz.resource_armadillo.block.entity.ModBlockEntities;
 import net.zuperz.resource_armadillo.block.entity.renderer.CentrifugeBlockEntityRenderer;
+import net.zuperz.resource_armadillo.block.entity.renderer.HiveBlockEntityRenderer;
+import net.zuperz.resource_armadillo.block.entity.renderer.NestBlockEntityRenderer;
 import net.zuperz.resource_armadillo.block.entity.renderer.RoostBlockEntityRenderer;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ModEntities;
 import net.zuperz.resource_armadillo.entity.custom.armadillo.ResourceArmadilloEntity;
@@ -23,6 +26,7 @@ import net.zuperz.resource_armadillo.item.custom.RainbowItem;
 import net.zuperz.resource_armadillo.item.custom.component.ModDataComponentTypes;
 import net.zuperz.resource_armadillo.recipes.ModRecipes;
 import net.zuperz.resource_armadillo.screen.ArmadilloHiveScreen;
+import net.zuperz.resource_armadillo.screen.NestScreen;
 import net.zuperz.resource_armadillo.screen.RoostScreen;
 import net.zuperz.resource_armadillo.screen.slot.ModMenuTypes;
 import net.zuperz.resource_armadillo.util.ArmadilloScuteRegistry;
@@ -54,7 +58,7 @@ public class ResourceArmadillo
     // Define mod id in a common place for everything to reference
     public static final String MOD_ID = "resource_armadillo";
     // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     private static boolean networkingRegistered = false;
     private static final Map<CustomPacketPayload.Type<?>, NetworkMessage<?>> MESSAGES = new HashMap<>();
@@ -63,6 +67,8 @@ public class ResourceArmadillo
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
     public ResourceArmadillo(IEventBus modEventBus, ModContainer modContainer)
     {
+        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerNetworking);
@@ -122,13 +128,16 @@ public class ResourceArmadillo
         @SubscribeEvent
         public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
             event.registerBlockEntityRenderer(ModBlockEntities.ROOST_BLOCK_ENTITY.get(), RoostBlockEntityRenderer::new);
+            event.registerBlockEntityRenderer(ModBlockEntities.ARMADILLO_HIVE.get(), HiveBlockEntityRenderer::new);
             event.registerBlockEntityRenderer(ModBlockEntities.CENTRIFUGE_BLOCK_ENTITY.get(), CentrifugeBlockEntityRenderer::new);
+            event.registerBlockEntityRenderer(ModBlockEntities.NEST_BLOCK_ENTITY.get(), NestBlockEntityRenderer::new);
         }
 
         @SubscribeEvent
         public static void registerScreens(RegisterMenuScreensEvent event) {
             event.register(ModMenuTypes.ATOMIC_OVEN_MENU.get(), RoostScreen::new);
             event.register(ModMenuTypes.ARMADILLO_HIVE_MENU.get(), ArmadilloHiveScreen::new);
+            event.register(ModMenuTypes.NEST_MENU.get(), NestScreen::new);
         }
 
         @SubscribeEvent

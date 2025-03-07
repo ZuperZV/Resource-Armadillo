@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_amethyst_essence": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:amethyst_essence"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_armadillo:amethyst_shard_essence_recipe"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_amethyst_essence"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_armadillo:amethyst_shard_essence_recipe"
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "resource_armadillo:breeding",
+  "armadillo_ingredient_1": {
+    "item": "resource_armadillo:diamond_scute"
+  },
+  "armadillo_ingredient_2": {
+    "item": "resource_armadillo:gold_scute"
+  },
+  "food_1": {
+    "tag": "minecraft:armadillo_food"
+  },
+  "food_2": {
+    "tag": "minecraft:armadillo_food"
+  },
+  "output": {
+    "item": "resource_armadillo:emerald_scute"
+  }
+}

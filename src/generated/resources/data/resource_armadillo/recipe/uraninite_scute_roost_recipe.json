@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "minecraft:ender_eye"
+  },
+  "ingredient_2": {
+    "item": "powah:uraninite"
+  },
+  "output": {
+    "item": "resource_armadillo:uraninite_scute"
+  }
+}

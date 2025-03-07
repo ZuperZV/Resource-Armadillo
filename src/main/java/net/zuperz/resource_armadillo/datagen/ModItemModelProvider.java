@@ -12,12 +12,15 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
+import net.zuperz.resource_armadillo.item.ModArmadilloScutes;
 import net.zuperz.resource_armadillo.item.ModItems;
 import net.zuperz.resource_armadillo.util.ArmadilloScuteRegistry;
+import net.zuperz.resource_armadillo.util.ArmadilloScuteType;
 
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -32,44 +35,43 @@ public class ModItemModelProvider extends ItemModelProvider {
         withExistingParent(ModItems.RESOURCE_ARMADILLO_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.ARMADILLO_TAB.getId().getPath(), mcLoc("resource_armadillo:item/template_resource_armadillo"));
 
+        basicItem(ModItems.GOLD_BRUSH.get());
         basicItem(ModItems.IRON_BRUSH.get());
+        basicItem(ModItems.CHROMIUM_BRUSH.get());
+        basicItem(ModItems.DIAMOND_BRUSH.get());
+        basicItem(ModItems.NETHERITE_BRUSH.get());
+
         basicItem(ModItems.ARMADILLO_PART.get());
 
         basicItem(ModItems.CHROMIUM_INGOT.get());
         basicItem(ModItems.RAW_CHROMIUM.get());
 
-        ArmadilloScuteRegistry registry = ArmadilloScuteRegistry.getInstance();
-        for (var scute : registry.getArmadilloScuteTypes()) {
-            if (scute.isEnabled() && !scute.getName().equals("none")) {
+        for (ArmadilloScuteType scute : ModArmadilloScutes.SCUTE_TYPES) {
+            if (scute == ModArmadilloScutes.NONE) continue;
+
+            if (!scute.getName().equals("none")) {
                 String scuteName = scute.getName() + "_scute";
-                ResourceLocation scuteLocation = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, scuteName);
-                Item scuteItem = BuiltInRegistries.ITEM.get(scuteLocation);
-                if (scuteItem != null) {
-                    basicItem(scuteItem);
-                }
+                 basicModItem(scuteName);
 
                 String essenceName = scute.getName() + "_essence";
-                ResourceLocation essenceLocation = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, essenceName);
-                Item essenceItem = BuiltInRegistries.ITEM.get(essenceLocation);
-                if (essenceItem != null) {
-                    basicItem(essenceItem);
-                }
+                basicModItem(essenceName);
 
                 String armorName = scute.getName() + "_armor";
-                ResourceLocation armorLocation = ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, armorName);
-                Item armorItem = BuiltInRegistries.ITEM.get(armorLocation);
-                if (armorItem != null) {
-                    generateItemWithWolfArmorOverlay(armorItem);
-                }
+                    generateItemWithWolfArmorOverlay(armorName);
             }
         }
     }
 
-    private ItemModelBuilder generateItemWithWolfArmorOverlay(Item item) {
-        ResourceLocation itemResourceLocation = BuiltInRegistries.ITEM.getKey(item);
-        return withExistingParent(itemResourceLocation.getPath(),
-                ResourceLocation.parse("item/generated"))
-                .texture("layer0", ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "item/" + itemResourceLocation.getPath()))
+    public ItemModelBuilder basicModItem(String item) {
+        return getBuilder(item)
+                .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                .texture("layer0", ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "item/" + item));
+    }
+
+    private ItemModelBuilder generateItemWithWolfArmorOverlay(String itemName) {
+        return getBuilder(itemName)
+                .parent(new ModelFile.UncheckedModelFile("item/generated"))
+                .texture("layer0", ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "item/" + itemName))
                 .texture("layer1", ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "item/wolf_armor_overlay"));
     }
 

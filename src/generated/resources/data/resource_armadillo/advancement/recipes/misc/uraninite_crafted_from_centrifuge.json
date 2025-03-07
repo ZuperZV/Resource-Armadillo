@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_armadillo:uraninite_crafted_from_centrifuge"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_uraninite_scute": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:uraninite_scute"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_uraninite_scute"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_armadillo:uraninite_crafted_from_centrifuge"
+    ]
+  }
+}

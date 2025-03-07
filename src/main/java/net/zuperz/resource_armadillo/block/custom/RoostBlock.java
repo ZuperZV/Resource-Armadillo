@@ -33,7 +33,7 @@ import net.zuperz.resource_armadillo.block.entity.custom.RoostBlockEntity;
 
 import javax.annotation.Nullable;
 
-public class RoostBlock extends Block implements EntityBlock {
+public class RoostBlock extends BasicArmadilloBlock  {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static BooleanProperty ARMADILLO_DATA = BooleanProperty.create("armadillo_data");
@@ -55,54 +55,19 @@ public class RoostBlock extends Block implements EntityBlock {
     private static final VoxelShape SHAPE_SOUTH = rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_NORTH);
     private static final VoxelShape SHAPE_WEST = rotateShape(Direction.NORTH, Direction.WEST, SHAPE_NORTH);
 
-    //* Rescource Armadillo *//
-
     public RoostBlock(Properties properties) {
-        super(Properties.of());
+        super(properties);
     }
 
     @Override
-    protected VoxelShape getShape(BlockState p_54561_, BlockGetter p_54562_, BlockPos p_54563_, CollisionContext p_54564_) {
-        switch ((Direction)p_54561_.getValue(FACING)) {
-            case NORTH:
-                return SHAPE_NORTH;
-            case SOUTH:
-                return SHAPE_SOUTH;
-            case EAST:
-                return SHAPE_EAST;
-            case WEST:
-                return SHAPE_WEST;
-            default:
-                return SHAPE_NORTH;
-        }
-    }
-
-    @Override
-    public RenderShape getRenderShape(BlockState pState) {
-        return RenderShape.MODEL;
-    }
-
-    @Override
-    public BlockState rotate(BlockState pState, Rotation pRot) {
-        return pState.setValue(FACING, pRot.rotate(pState.getValue(FACING)));
-    }
-
-    @Override
-    public BlockState mirror(BlockState pState, Mirror pMirror) {
-        return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
-    }
-
-    @org.jetbrains.annotations.Nullable
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
-        return this.defaultBlockState().setValue(FACING, pContext.getHorizontalDirection().getOpposite())
-                .setValue(LIT, false)
-                .setValue(ARMADILLO_DATA, false);
-    }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(FACING, LIT, ARMADILLO_DATA);
+    protected VoxelShape getVoxelShape(Direction facing) {
+        return switch (facing) {
+            case NORTH -> SHAPE_NORTH;
+            case EAST -> SHAPE_EAST;
+            case SOUTH -> SHAPE_SOUTH;
+            case WEST -> SHAPE_WEST;
+            default -> SHAPE_NORTH;
+        };
     }
 
     @Override
@@ -150,17 +115,6 @@ public class RoostBlock extends Block implements EntityBlock {
         return ItemInteractionResult.sidedSuccess(true);
     }
 
-    @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (state.getBlock() != newState.getBlock()) {
-            if (level.getBlockEntity(pos) instanceof RoostBlockEntity furnace) {
-                furnace.spawnResourceArmadilloFromData(furnace, "0");
-                furnace.setItem(3, ItemStack.EMPTY);
-                furnace.dropItems();
-            }
-        }
-        super.onRemove(state, level, pos, newState, movedByPiston);
-    }
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
@@ -183,12 +137,12 @@ public class RoostBlock extends Block implements EntityBlock {
             double d5 = direction$axis == Direction.Axis.X ? (double)direction.getStepX() * 0.52 : d4;
             double d6 = random.nextDouble() * 6.0 / 16.0;
             double d7 = direction$axis == Direction.Axis.Z ? (double)direction.getStepZ() * 0.52 : d4;
-            
+
             double defaultOffset = random.nextDouble() * 0.6 - 0.3;
             double xOffsets = direction$axis == Direction.Axis.X ? (double)direction.getStepX() * 0.52 : defaultOffset;
             double yOffset = random.nextDouble() * 6.0 / 8.0;
             double zOffset = direction$axis == Direction.Axis.Z ? (double)direction.getStepZ() * 0.52 : defaultOffset;
-            
+
             level.addParticle(ParticleTypes.SMOKE, d0 + d5, d1 + d6, d2 + d7, 0.0, 0.0, 0.0);
             level.addParticle(ParticleTypes.FLAME, d0 + d5, d1 + d6, d2 + d7, 0.0, 0.0, 0.0);
 
@@ -197,6 +151,48 @@ public class RoostBlock extends Block implements EntityBlock {
                         xPos + xOffsets, yPos + yOffset, zPos + zOffset, 0.002, 0.001, 0.002);
             }
         }
+    }
+
+
+
+    @Override
+    public RenderShape getRenderShape(BlockState pState) {
+        return RenderShape.MODEL;
+    }
+
+    @Override
+    public BlockState rotate(BlockState pState, Rotation pRot) {
+        return pState.setValue(FACING, pRot.rotate(pState.getValue(FACING)));
+    }
+
+    @Override
+    public BlockState mirror(BlockState pState, Mirror pMirror) {
+        return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
+    }
+
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        return this.defaultBlockState().setValue(FACING, pContext.getHorizontalDirection().getOpposite())
+                .setValue(LIT, false)
+                .setValue(ARMADILLO_DATA, false);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        pBuilder.add(FACING, LIT, ARMADILLO_DATA);
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (state.getBlock() != newState.getBlock()) {
+            if (level.getBlockEntity(pos) instanceof RoostBlockEntity furnace) {
+                furnace.spawnResourceArmadilloFromData(furnace, "0");
+                furnace.setItem(3, ItemStack.EMPTY);
+                furnace.dropItems();
+            }
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {

@@ -14,6 +14,8 @@ public class ModItemBlockRenderTypes {
     public static void registerItemModelProperties(final FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             ItemBlockRenderTypes.setRenderLayer(ModBlocks.CENTRIFUGE.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(ModBlocks.ARMADILLO_HIVE.get(), RenderType.cutout());
+            ItemBlockRenderTypes.setRenderLayer(ModBlocks.NEST.get(), RenderType.cutout());
         });
     }
 }

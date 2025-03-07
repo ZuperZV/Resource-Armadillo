@@ -8,6 +8,7 @@ import net.zuperz.resource_armadillo.ResourceArmadillo;
 import net.zuperz.resource_armadillo.block.ModBlocks;
 import net.zuperz.resource_armadillo.block.entity.custom.ArmadilloHiveBlockEntity;
 import net.zuperz.resource_armadillo.block.entity.custom.CentrifugeBlockEntity;
+import net.zuperz.resource_armadillo.block.entity.custom.NestBlockEntity;
 import net.zuperz.resource_armadillo.block.entity.custom.RoostBlockEntity;
 
 import java.util.function.Supplier;
@@ -24,6 +25,11 @@ public class ModBlockEntities {
     public static final Supplier<BlockEntityType<ArmadilloHiveBlockEntity>> ARMADILLO_HIVE =
             BLOCK_ENTITIES.register("armadillo_hive", () -> BlockEntityType.Builder.of(
                     ArmadilloHiveBlockEntity::new, ModBlocks.ARMADILLO_HIVE.get()).build(null));
+
+    public static final Supplier<BlockEntityType<NestBlockEntity>> NEST_BLOCK_ENTITY =
+            BLOCK_ENTITIES.register("nest_be", () -> BlockEntityType.Builder.of(
+                    NestBlockEntity::new, ModBlocks.NEST.get()).build(null));
+
 
     public static final Supplier<BlockEntityType<CentrifugeBlockEntity>> CENTRIFUGE_BLOCK_ENTITY =
             BLOCK_ENTITIES.register("centrifuge_be", () -> BlockEntityType.Builder.of(

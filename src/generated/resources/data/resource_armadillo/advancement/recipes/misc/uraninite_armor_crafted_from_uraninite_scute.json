@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_armadillo:uraninite_armor_crafted_from_uraninite_scute"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_uraninite_armor": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:uraninite_scute"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_uraninite_armor"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_armadillo:uraninite_armor_crafted_from_uraninite_scute"
+    ]
+  }
+}

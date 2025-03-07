@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "minecraft:diamond"
+  },
+  "ingredient_2": {
+    "item": "powah:crystal_niotic"
+  },
+  "output": {
+    "item": "resource_armadillo:crystal_niotic_scute"
+  }
+}

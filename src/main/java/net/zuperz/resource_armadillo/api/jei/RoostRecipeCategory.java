@@ -52,7 +52,7 @@ public class RoostRecipeCategory implements IRecipeCategory<RoostRecipe> {
         IDrawableStatic progressDrawable = helper.drawableBuilder(ARROW, 0, 0, 23, 15).setTextureSize(23, 15).addPadding(20, 0, 61, 0).build();
         this.arrowbacki = helper.drawableBuilder(ARROWBACK, 0, 0, 23, 15).setTextureSize(23, 15).addPadding(20, 0, 60, 0).build();
 
-        IDrawableStatic litProgressDrawable = helper.drawableBuilder(LIT_PROGRESS, 0, 0, 14, 14).setTextureSize(14, 14).addPadding(26, 0, 23, 0).build();
+        IDrawableStatic litProgressDrawable = helper.drawableBuilder(LIT_PROGRESS, 0, 0, 14, 14).setTextureSize(14, 14).addPadding(25, 0, 22, 0).build();
         this.lit = helper.drawableBuilder(LIT, 0, 0, 13, 13).setTextureSize(13, 13).addPadding(26, 0, 23, 0).build();
 
         this.slot_1 = helper.drawableBuilder(SLOT, 0, 18, 18, 18).setTextureSize(18, 18).addPadding(6,0,2,0).build();

@@ -15,20 +15,24 @@ public class ResourceArmadilloEmiPlugin implements EmiPlugin {
     public static final EmiStack CENTRIFUGE_WORKSTATION = EmiStack.of(ModBlocks.CENTRIFUGE.get());
     public static final EmiStack ROOST_WORKSTATION = EmiStack.of(ModBlocks.ROOST.get());
     public static final EmiStack HIVE_WORKSTATION = EmiStack.of(ModBlocks.ARMADILLO_HIVE.get());
+    public static final EmiStack NEST_WORKSTATION = EmiStack.of(ModBlocks.NEST.get());
 
     public static final EmiRecipeCategory CENTRIFUGE_CATEGORY = new EmiRecipeCategory(CENTRIFUGE_WORKSTATION.getId(), CENTRIFUGE_WORKSTATION);
     public static final EmiRecipeCategory ROOST_CATEGORY = new EmiRecipeCategory(ROOST_WORKSTATION.getId(), ROOST_WORKSTATION);
     public static final EmiRecipeCategory HIVE_CATEGORY = new EmiRecipeCategory(HIVE_WORKSTATION.getId(), HIVE_WORKSTATION);
+    public static final EmiRecipeCategory NEST_CATEGORY = new EmiRecipeCategory(NEST_WORKSTATION.getId(), NEST_WORKSTATION);
 
     @Override
     public void register(EmiRegistry registry) {
         registry.addCategory(CENTRIFUGE_CATEGORY);
         registry.addCategory(ROOST_CATEGORY);
         registry.addCategory(HIVE_CATEGORY);
+        registry.addCategory(NEST_CATEGORY);
 
         registry.addWorkstation(CENTRIFUGE_CATEGORY, CENTRIFUGE_WORKSTATION);
         registry.addWorkstation(ROOST_CATEGORY, ROOST_WORKSTATION);
         registry.addWorkstation(HIVE_CATEGORY, HIVE_WORKSTATION);
+        registry.addWorkstation(NEST_CATEGORY, NEST_WORKSTATION);
 
         RecipeManager manager = registry.getRecipeManager();
 
@@ -42,6 +46,10 @@ public class ResourceArmadilloEmiPlugin implements EmiPlugin {
 
         for (var recipe : manager.getAllRecipesFor(ModRecipes.BREEDING_ARMADILLO_RECIPE_TYPE.get())) {
             registry.addRecipe(new EmiHiveRecipe(recipe.value()));
+        }
+
+        for (var recipe : manager.getAllRecipesFor(ModRecipes.NEST_RECIPE_TYPE.get())) {
+            registry.addRecipe(new EmiNestRecipe(recipe.value()));
         }
     }
 }

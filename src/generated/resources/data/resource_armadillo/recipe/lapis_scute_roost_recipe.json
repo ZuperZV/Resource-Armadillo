@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "minecraft:lapis_lazuli"
+  },
+  "ingredient_2": {
+    "item": "resource_armadillo:quartz_scute"
+  },
+  "output": {
+    "item": "resource_armadillo:lapis_scute"
+  }
+}

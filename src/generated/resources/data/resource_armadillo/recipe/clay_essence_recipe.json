@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "resource_armadillo:clay_essence"
+    }
+  },
+  "pattern": [
+    " A ",
+    "AAA",
+    "A A"
+  ],
+  "result": {
+    "count": 16,
+    "id": "minecraft:clay"
+  }
+}

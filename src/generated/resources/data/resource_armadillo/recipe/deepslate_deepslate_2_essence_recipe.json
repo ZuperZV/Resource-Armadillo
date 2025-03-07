@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "resource_armadillo:deepslate_essence"
+    },
+    "B": {
+      "item": "resource_armadillo:stone_essence"
+    }
+  },
+  "pattern": [
+    "AAA",
+    "B B",
+    "AAA"
+  ],
+  "result": {
+    "count": 15,
+    "id": "minecraft:deepslate"
+  }
+}

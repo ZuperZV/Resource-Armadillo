@@ -1,10 +1,10 @@
 {
   "type": "resource_armadillo:roost",
   "ingredient_1": {
-    "item": "minecraft:netherrack"
+    "tag": "minecraft:flowers"
   },
   "ingredient_2": {
-    "item": "minecraft:nether_wart"
+    "item": "resource_armadillo:sand_scute"
   },
   "output": {
     "item": "resource_armadillo:netherrack_scute"

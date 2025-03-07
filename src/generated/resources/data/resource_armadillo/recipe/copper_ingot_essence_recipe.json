@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "resource_armadillo:copper_essence"
+    }
+  },
+  "pattern": [
+    "AAA",
+    "   ",
+    "AAA"
+  ],
+  "result": {
+    "count": 5,
+    "id": "minecraft:copper_ingot"
+  }
+}

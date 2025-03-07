@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": {
+    "item": "minecraft:gold_ingot"
+  },
+  "base": {
+    "item": "minecraft:brush"
+  },
+  "result": {
+    "count": 1,
+    "id": "resource_armadillo:gold_brush"
+  },
+  "template": []
+}

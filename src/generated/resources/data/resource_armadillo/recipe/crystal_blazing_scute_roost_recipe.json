@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "minecraft:blaze_rod"
+  },
+  "ingredient_2": {
+    "item": "powah:crystal_blazing"
+  },
+  "output": {
+    "item": "resource_armadillo:crystal_blazing_scute"
+  }
+}

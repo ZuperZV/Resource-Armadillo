@@ -110,23 +110,33 @@ public class RoostMenu extends AbstractContainerMenu {
 
     }
 
+    public float getBurnProgress() {
+        int i = blockentity.data.get(2);
+        int j = blockentity.data.get(3);
+
+        return j != 0 && i != 0 ? Mth.clamp((float)i / (float)j, 0.0F, 1.0F) : 0.0F;
+    }
+
+
     public int getScaledFuelBurnTime() {
-        int fuelBurnTime = blockentity.data.get(2);
-        int maxFuelBurnTime = blockentity.getMaxFuelBurnTime();
+        int fuelTime = blockentity.data.get(2);
+        int maxFuelTime = blockentity.data.get(3);
         int fuelBarHeight = 14;
 
-        return maxFuelBurnTime != 0 && fuelBurnTime != 0 ? fuelBurnTime * fuelBarHeight / maxFuelBurnTime : 0;
+        return maxFuelTime != 0 && fuelTime != 0 ? (fuelTime * fuelBarHeight / maxFuelTime) : 0;
     }
 
     public float getLitProgress() {
-        int i = blockentity.data.get(2);
-        int maxFuelBurnTime = blockentity.getMaxFuelBurnTime();
-        if (i == 0) {
-            i = 200;
+        int fuelTime = blockentity.data.get(2);
+        int maxFuelTime = blockentity.data.get(3);
+
+        if (maxFuelTime == 0) {
+            maxFuelTime = 200;
         }
 
-        return Mth.clamp((float)blockentity.data.get(2) / (float)i, 0.0F, 1.0F);
+        return Mth.clamp((float) fuelTime / (float) maxFuelTime, 0.0F, 1.0F);
     }
+
 
     public int getScaledEntityProgress() {
         int progress = blockentity.data.get(0);

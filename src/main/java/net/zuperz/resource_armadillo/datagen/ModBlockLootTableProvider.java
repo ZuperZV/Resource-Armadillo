@@ -35,9 +35,10 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     protected void generate() {
         dropSelf(ModBlocks.ARMADILLO_HIVE.get());
         dropSelf(ModBlocks.ROOST.get());
+        dropSelf(ModBlocks.CENTRIFUGE.get());
+        dropSelf(ModBlocks.NEST.get());
 
         dropSelf(ModBlocks.CHROMIUM_BLOCK.get());
-        dropSelf(ModBlocks.CENTRIFUGE.get());
 
         this.add(ModBlocks.CHROMIUM_ORE.get(),
                 block -> createMultipleOreDrops(ModBlocks.CHROMIUM_ORE.get(), ModItems.RAW_CHROMIUM.get(), 1, 3));

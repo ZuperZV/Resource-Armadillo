@@ -1,0 +1,9 @@
+{
+  "type": "resource_armadillo:nest",
+  "armadillo_ingredient_1": {
+    "item": "resource_armadillo:copper_scute"
+  },
+  "output": {
+    "item": "resource_armadillo:copper_scute"
+  }
+}

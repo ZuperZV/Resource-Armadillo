@@ -1,43 +1,21 @@
 package net.zuperz.resource_armadillo.block.custom;
 
-import com.mojang.serialization.MapCodec;
-import net.minecraft.Util;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.EnchantmentTags;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.boss.wither.WitherBoss;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.item.PrimedTnt;
-import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.WitherSkull;
-import net.minecraft.world.entity.vehicle.MinecartTNT;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.BlockItemStateProperties;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -48,106 +26,58 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zuperz.resource_armadillo.block.entity.custom.ArmadilloHiveBlockEntity;
-import net.zuperz.resource_armadillo.block.entity.custom.ArmadilloHiveBlockEntity;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
-public class ArmadilloHiveBlock extends Block implements EntityBlock {
+public class ArmadilloHiveBlock extends BasicArmadilloBlock  {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static BooleanProperty ARMADILLO_DATA = BooleanProperty.create("armadillo_data");
 
     private static final VoxelShape SHAPE_NORTH = Shapes.or(
-            box(0.875, 4, 0.625, 15.375, 6, 15.125),
-
-            box(2.125, 6, 1.375, 14.125, 8, 13.875),
-
-            box(13.875, 6, 1.875, 14.875, 13, 13.875),
-
-            box(1.375, 6, 2.125, 2.375, 13, 14.125),
-
-            box(1.875, 6, 13.625, 13.875, 14, 14.625),
-
-            box(1.125, 6, 0.875, 3.125, 15, 2.875),
-
-            box(13.125, 6, 12.875, 15.125, 15, 14.875),
-
-            box(1.125, 6, 13.125, 3.125, 15, 15.125),
-
-            box(13.125, 6, 0.875, 15.125, 15, 2.875),
-
-            box(0.125, 0, -0.125, 16.125, 4, 15.875)
+            box(1, 2, 1, 3, 13, 15),
+            box(3, 2, 3, 13, 3, 13),
+            box(13, 2, 1, 15, 13, 15),
+            box(2, 2, 1, 14, 7, 3),
+            box(2, 2, 13, 14, 15, 15),
+            box(2, 6, 2, 14, 6, 14),
+            box(0, 0, 0, 4, 16, 4),
+            box(12, 0, 0, 16, 16, 4),
+            box(0, 0, 12, 4, 16, 16),
+            box(12, 0, 12, 16, 16, 16),
+            box(2, 5, 2, 14, 6, 14)
     );
 
     private static final VoxelShape SHAPE_EAST = rotateShape(Direction.NORTH, Direction.EAST, SHAPE_NORTH);
     private static final VoxelShape SHAPE_SOUTH = rotateShape(Direction.NORTH, Direction.SOUTH, SHAPE_NORTH);
     private static final VoxelShape SHAPE_WEST = rotateShape(Direction.NORTH, Direction.WEST, SHAPE_NORTH);
 
-    //* Rescource Armadillo *//
-
-
-
-    public ArmadilloHiveBlock(BlockBehaviour.Properties properties) {
-        super(BlockBehaviour.Properties.of());
+    public ArmadilloHiveBlock(Properties properties) {
+        super(properties);
     }
 
     @Override
-    protected VoxelShape getShape(BlockState p_54561_, BlockGetter p_54562_, BlockPos p_54563_, CollisionContext p_54564_) {
-        switch ((Direction)p_54561_.getValue(FACING)) {
-            case NORTH:
-                return SHAPE_NORTH;
-            case SOUTH:
-                return SHAPE_SOUTH;
-            case EAST:
-                return SHAPE_EAST;
-            case WEST:
-                return SHAPE_WEST;
-            default:
-                return SHAPE_NORTH;
-        }
-    }
-
-    @Override
-    public RenderShape getRenderShape(BlockState pState) {
-        return RenderShape.MODEL;
-    }
-
-    @Override
-    public BlockState rotate(BlockState pState, Rotation pRot) {
-        return pState.setValue(FACING, pRot.rotate(pState.getValue(FACING)));
-    }
-
-    @Override
-    public BlockState mirror(BlockState pState, Mirror pMirror) {
-        return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
-    }
-
-    @org.jetbrains.annotations.Nullable
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
-        return this.defaultBlockState().setValue(FACING, pContext.getHorizontalDirection().getOpposite())
-                .setValue(LIT, false)
-                .setValue(ARMADILLO_DATA, false);
-    }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(FACING, LIT, ARMADILLO_DATA);
+    protected VoxelShape getVoxelShape(Direction facing) {
+        return switch (facing) {
+            case NORTH -> SHAPE_NORTH;
+            case EAST -> SHAPE_EAST;
+            case SOUTH -> SHAPE_SOUTH;
+            case WEST -> SHAPE_WEST;
+            default -> SHAPE_NORTH;
+        };
     }
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ArmadilloHiveBlockEntity(pos, state);
     }
+
+
 
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
@@ -189,18 +119,7 @@ public class ArmadilloHiveBlock extends Block implements EntityBlock {
         return ItemInteractionResult.sidedSuccess(true);
     }
 
-    @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (state.getBlock() != newState.getBlock()) {
-            if (level.getBlockEntity(pos) instanceof ArmadilloHiveBlockEntity furnace) {
-                furnace.spawnResourceArmadilloFromData(furnace, "0", 3);
-                furnace.setItem(3, ItemStack.EMPTY);
-                furnace.setItem(2, ItemStack.EMPTY);
-                furnace.dropItems();
-            }
-        }
-        super.onRemove(state, level, pos, newState, movedByPiston);
-    }
+
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
@@ -237,6 +156,48 @@ public class ArmadilloHiveBlock extends Block implements EntityBlock {
                         xPos + xOffsets, yPos + yOffset, zPos + zOffset, 0.002, 0.001, 0.002);
             }
         }
+    }
+
+
+    @Override
+    public RenderShape getRenderShape(BlockState pState) {
+        return RenderShape.MODEL;
+    }
+
+    @Override
+    public BlockState rotate(BlockState pState, Rotation pRot) {
+        return pState.setValue(FACING, pRot.rotate(pState.getValue(FACING)));
+    }
+
+    @Override
+    public BlockState mirror(BlockState pState, Mirror pMirror) {
+        return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
+    }
+
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        return this.defaultBlockState().setValue(FACING, pContext.getHorizontalDirection().getOpposite())
+                .setValue(LIT, false)
+                .setValue(ARMADILLO_DATA, false);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        pBuilder.add(FACING, LIT, ARMADILLO_DATA);
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (state.getBlock() != newState.getBlock()) {
+            if (level.getBlockEntity(pos) instanceof ArmadilloHiveBlockEntity furnace) {
+                furnace.spawnResourceArmadilloFromData(furnace, "0", 3);
+                furnace.setItem(3, ItemStack.EMPTY);
+                furnace.setItem(2, ItemStack.EMPTY);
+                furnace.dropItems();
+            }
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {

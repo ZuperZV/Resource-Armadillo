@@ -31,14 +31,15 @@ public class ArmadilloScuteRegistry {
     private static boolean allowRegistration = false;
 
     public void register(ArmadilloScuteType armadilloScuteType) {
-        if (this.allowRegistration && armadilloScuteType.isEnabled()) {
-            if (this.ArmadilloScuteTypes.values().stream()
-                    .noneMatch(c -> c.getName().equals(armadilloScuteType.getName()))) {
-                this.ArmadilloScuteTypes.put(armadilloScuteType.getId(), armadilloScuteType);
+        if (allowRegistration) {
+            if (armadilloScuteType.isEnabled()) {
+                if (this.ArmadilloScuteTypes.values().stream()
+                        .noneMatch(c -> c.getName().equals(armadilloScuteType.getName()))) {
+                    this.ArmadilloScuteTypes.put(armadilloScuteType.getId(), armadilloScuteType);
+                }
             }
         }
     }
-
     public List<ArmadilloScuteType> getArmadilloScuteTypes() {
         return List.copyOf(this.ArmadilloScuteTypes.values());
     }

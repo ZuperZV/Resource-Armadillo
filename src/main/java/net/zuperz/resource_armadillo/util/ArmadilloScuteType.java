@@ -27,7 +27,6 @@ public class ArmadilloScuteType {
     private Supplier<? extends Item> essence;
     private boolean enabled;
     private boolean registerEssenceItem;
-
     public ArmadilloScuteType(ResourceLocation id, ResourceLocation texture, ResourceLocation armorTexture, boolean enabled) {
         this.id = id;
         this.enabled = enabled;

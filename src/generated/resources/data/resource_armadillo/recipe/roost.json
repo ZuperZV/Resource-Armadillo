@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "tag": "c:rods/wooden"
+    },
+    "B": {
+      "item": "minecraft:furnace"
+    },
+    "C": {
+      "tag": "minecraft:logs"
+    },
+    "D": {
+      "item": "minecraft:hay_block"
+    },
+    "E": {
+      "tag": "c:gems"
+    }
+  },
+  "pattern": [
+    "A A",
+    "CDC",
+    "EBE"
+  ],
+  "result": {
+    "count": 1,
+    "id": "resource_armadillo:roost"
+  }
+}

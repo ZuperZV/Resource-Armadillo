@@ -16,6 +16,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.core.BlockPos;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
 import net.zuperz.resource_armadillo.block.entity.custom.ArmadilloHiveBlockEntity;
+import net.zuperz.resource_armadillo.block.entity.custom.NestBlockEntity;
 import net.zuperz.resource_armadillo.block.entity.custom.RoostBlockEntity;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
@@ -69,6 +70,13 @@ public record ScreenButton(int buttonID, int x, int y, int z) implements CustomP
                 if (level.getBlockEntity(pos) instanceof ArmadilloHiveBlockEntity blockEntity) {
 
                     blockEntity.spawnResourceArmadilloFromData(blockEntity, "0.5", 2);
+                }
+            }
+        } else if (buttonID == 3) {
+            if (level != null && pos != null) {
+                if (level.getBlockEntity(pos) instanceof NestBlockEntity blockEntity) {
+
+                    blockEntity.spawnResourceArmadilloFromData(blockEntity, "0.5", 1);
                 }
             }
         }

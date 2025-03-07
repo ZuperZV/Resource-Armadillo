@@ -15,6 +15,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
 import net.zuperz.resource_armadillo.block.custom.ArmadilloHiveBlock;
 import net.zuperz.resource_armadillo.block.custom.CentrifugeBlock;
+import net.zuperz.resource_armadillo.block.custom.NestBlock;
 import net.zuperz.resource_armadillo.block.custom.RoostBlock;
 import net.zuperz.resource_armadillo.item.ModItems;
 
@@ -31,6 +32,9 @@ public class ModBlocks {
     public static final DeferredBlock<Block> ROOST = registerBlock("roost",
             () -> new RoostBlock(BlockBehaviour.Properties.of().requiresCorrectToolForDrops().strength(5.0F, 6.0F).noOcclusion()));
 
+    public static final DeferredBlock<Block> NEST = registerBlock("nest",
+            () -> new NestBlock(BlockBehaviour.Properties.of().requiresCorrectToolForDrops().strength(5.0F, 6.0F).noOcclusion()));
+
     public static final DeferredBlock<Block> ARMADILLO_HIVE = registerBlock("armadillo_hive",
             () -> new ArmadilloHiveBlock(BlockBehaviour.Properties.of().requiresCorrectToolForDrops().strength(5.0F, 6.0F).noOcclusion()));
 
@@ -41,6 +45,7 @@ public class ModBlocks {
     public static final DeferredBlock<Block> CHROMIUM_ORE = registerBlock("chromium_ore",
             () -> new DropExperienceBlock(UniformInt.of(2, 5),
                     BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops()));
+
     public static final DeferredBlock<Block> CHROMIUM_DEEPSLATE_ORE = registerBlock("chromium_deepslate_ore",
             () -> new DropExperienceBlock(UniformInt.of(3, 6),
                     BlockBehaviour.Properties.of().strength(6f).requiresCorrectToolForDrops()));

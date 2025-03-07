@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "tag": "minecraft:flowers"
+  },
+  "ingredient_2": {
+    "item": "resource_armadillo:sand_scute"
+  },
+  "output": {
+    "item": "resource_armadillo:dye_scute"
+  }
+}

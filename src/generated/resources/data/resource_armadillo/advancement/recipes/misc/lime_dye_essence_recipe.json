@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_dye_essence": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:dye_essence"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_armadillo:lime_dye_essence_recipe"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_dye_essence"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_armadillo:lime_dye_essence_recipe"
+    ]
+  }
+}

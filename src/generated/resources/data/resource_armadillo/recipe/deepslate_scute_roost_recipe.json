@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "minecraft:cobbled_deepslate"
+  },
+  "ingredient_2": {
+    "item": "resource_armadillo:dirt_scute"
+  },
+  "output": {
+    "item": "resource_armadillo:deepslate_scute"
+  }
+}

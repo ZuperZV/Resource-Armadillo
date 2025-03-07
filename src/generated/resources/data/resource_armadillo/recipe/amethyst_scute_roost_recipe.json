@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "minecraft:amethyst_shard"
+  },
+  "ingredient_2": {
+    "item": "resource_armadillo:quartz_scute"
+  },
+  "output": {
+    "item": "resource_armadillo:amethyst_scute"
+  }
+}

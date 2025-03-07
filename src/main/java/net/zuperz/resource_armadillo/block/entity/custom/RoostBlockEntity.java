@@ -11,11 +11,14 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.player.Inventory;
@@ -26,8 +29,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -58,15 +63,15 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
     private final Lazy<IItemHandler> inputItemHandler = Lazy.of(() -> new CustomItemHandler(inputItems));
     private final Lazy<IItemHandler> outputItemHandler = Lazy.of(() -> new CustomItemHandler(outputItems));
 
-    private static final int[] SLOTS_FOR_UP = new int[]{0, 1, 2, 3};
+    private static final int[] SLOTS_FOR_UP = new int[]{2};
     private static final int[] SLOTS_FOR_DOWN = new int[]{4};
-    private static final int[] SLOTS_FOR_SIDES = new int[]{0, 1, 2, 3};
+    private static final int[] SLOTS_FOR_SIDES = new int[]{0, 1};
 
     private int progress = 0;
     private int maxProgress = 3000;
 
     private int fuelBurnTime = 0;
-    private int maxFuelBurnTime = 30000;
+    private int fuelMaxBurnTime = 30000;
 
     private long lastArmadilloExitTime = 0;
     private static final long ARMADILLO_COOLDOWN_TIME = 5000;
@@ -84,6 +89,7 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
                     case 0 -> RoostBlockEntity.this.progress;
                     case 1 -> RoostBlockEntity.this.maxProgress;
                     case 2 -> RoostBlockEntity.this.fuelBurnTime;
+                    case 3 -> RoostBlockEntity.this.fuelMaxBurnTime;
                     default -> 0;
                 };
             }
@@ -94,12 +100,13 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
                     case 0 -> RoostBlockEntity.this.progress = pValue;
                     case 1 -> RoostBlockEntity.this.maxProgress = pValue;
                     case 2 -> RoostBlockEntity.this.fuelBurnTime = pValue;
+                    case 3 -> RoostBlockEntity.this.fuelMaxBurnTime = pValue;
                 }
             }
 
             @Override
             public int getCount() {
-                return 3;
+                return 4;
             }
         };
     }
@@ -123,7 +130,8 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
             blockEntity.fuelBurnTime = blockEntity.getFuelBurnTime(blockEntity.inputItems.getStackInSlot(2));
             if (blockEntity.fuelBurnTime > 0) {
                 dirty = true;
-                ItemStack fuelStack = blockEntity.inputItems.extractItem(2, 1, false);
+                blockEntity.inputItems.extractItem(2, 1, false);
+                this.fuelMaxBurnTime = this.fuelBurnTime;
             }
         }
 
@@ -153,7 +161,6 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
             level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
         }
     }
-
 
     private boolean canConsumeFuel() {
         return isFuel(this.inputItems.getStackInSlot(2));
@@ -348,9 +355,6 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
             } catch (Exception e) {
                 System.err.println("Failed to spawn ResourceArmadillo from stored data: " + e.getMessage());
             }
-        } else if (blockEntity.getStoredArmadilloData().isEmpty()) {
-            System.out.println("Resource Armadillo:\n" +
-                    "the Armadillo data was somehow erased or it didn't even have one.");
         }
     }
 
@@ -443,7 +447,7 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
     }
 
     public int getMaxFuelBurnTime() {
-        return maxFuelBurnTime;
+        return fuelMaxBurnTime;
     }
 
     @Nullable
@@ -639,12 +643,13 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
             return;
         }
 
-        double radius = 1.65;
+        double radius = 2;
         AABB searchArea = new AABB(
                 Vec3.atLowerCornerOf(pos.offset((int) -radius, (int) -radius, (int) -radius)),
                 Vec3.atLowerCornerOf(pos.offset((int) radius, (int) radius, (int) radius))
         );
 
+        List<Player> players = level.getEntitiesOfClass(Player.class, searchArea);
         List<Armadillo> armadillos = level.getEntitiesOfClass(Armadillo.class, searchArea);
 
         if (isArmadilloDataEmpty()) {
@@ -656,6 +661,7 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
 
                 blockEntity.setStoredArmadilloData(armadilloData.toString());
                 armadillo.discard();
+                level.playSound((Entity) players, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 2f);
 
                 lastArmadilloExitTime = System.currentTimeMillis();
 

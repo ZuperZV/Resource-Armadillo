@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": {
+    "item": "resource_armadillo:chromium_ingot"
+  },
+  "base": {
+    "item": "resource_armadillo:iron_brush"
+  },
+  "result": {
+    "count": 1,
+    "id": "resource_armadillo:chromium_brush"
+  },
+  "template": []
+}

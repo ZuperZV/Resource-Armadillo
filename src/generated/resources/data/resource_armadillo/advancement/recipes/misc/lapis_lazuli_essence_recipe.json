@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_lapis_essence": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:lapis_essence"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_armadillo:lapis_lazuli_essence_recipe"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_lapis_essence"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_armadillo:lapis_lazuli_essence_recipe"
+    ]
+  }
+}

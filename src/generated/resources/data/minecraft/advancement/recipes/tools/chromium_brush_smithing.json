@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_item.resource_armadillo.iron_brush": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:iron_brush"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:chromium_brush_smithing"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_item.resource_armadillo.iron_brush"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:chromium_brush_smithing"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "resource_armadillo:block/hive",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "resource_armadillo:block/hive"
+    },
+    "facing=south": {
+      "model": "resource_armadillo:block/hive",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "resource_armadillo:block/hive",
+      "y": 270
+    }
+  }
+}

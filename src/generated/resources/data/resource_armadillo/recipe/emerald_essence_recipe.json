@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "resource_armadillo:emerald_essence"
+    }
+  },
+  "pattern": [
+    "AAA",
+    " A ",
+    "AAA"
+  ],
+  "result": {
+    "count": 3,
+    "id": "minecraft:emerald"
+  }
+}

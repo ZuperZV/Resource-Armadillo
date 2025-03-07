@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "tag": "c:ingots"
+  },
+  "ingredient_2": {
+    "item": "powah:steel_energized"
+  },
+  "output": {
+    "item": "resource_armadillo:steel_energized_scute"
+  }
+}

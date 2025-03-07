@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "resource_armadillo:stone_essence"
+    },
+    "B": {
+      "item": "resource_armadillo:cobblestone_essence"
+    }
+  },
+  "pattern": [
+    "AAA",
+    "BAB",
+    "AAA"
+  ],
+  "result": {
+    "count": 32,
+    "id": "minecraft:stone"
+  }
+}

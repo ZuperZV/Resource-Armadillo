@@ -14,6 +14,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.player.Inventory;
@@ -83,13 +84,10 @@ public class RoostScreen extends AbstractContainerScreen<RoostMenu> {
         int progressArrowWidth = menu.getScaledProgress();
         guiGraphics.blit(TEXTURE, x + 81, y + 38, 176, 0, progressArrowWidth, 15);
 
-        int scaledFuel = menu.getScaledFuelBurnTime();
-        guiGraphics.blit(TEXTURE, x + 52, y + 38, 199, 0, 14, scaledFuel);
-
-        //int i = this.leftPos;
-        //int j = this.topPos;
-        //int l = Mth.ceil(this.menu.getLitProgress() * 13.0F) + 1;
-        //guiGraphics.blitSprite(ResourceLocation.withDefaultNamespace("container/furnace/lit_progress"), 14, 14, 0, 14 - l, i + 56, j + 36 + 14 - l, 14, l);
+        if (this.menu.getLitProgress() > 0) {
+            int fuelHeight = this.menu.getScaledFuelBurnTime();
+            guiGraphics.blit(TEXTURE, x + 52, y + 38 + (14 - fuelHeight), 199, 14 - fuelHeight, 14, fuelHeight);
+        }
 
         Level level = Minecraft.getInstance().level;
         if (level != null) {

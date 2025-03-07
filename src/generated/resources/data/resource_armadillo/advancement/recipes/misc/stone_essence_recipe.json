@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_stone_essence": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:stone_essence"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_armadillo:stone_essence_recipe"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_stone_essence"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_armadillo:stone_essence_recipe"
+    ]
+  }
+}

@@ -25,15 +25,15 @@ public class EmiHiveRecipe extends BasicEmiRecipe {
         widgets.addTexture(EmiTexture.EMPTY_ARROW, 63, 20);
         widgets.addAnimatedTexture(EmiTexture.FULL_ARROW, 63, 20, 2000, true, false, false);
 
-        widgets.addSlot(inputs.get(0), 7, 36).drawBack(true);
-        widgets.addSlot(inputs.get(1), 39, 36).drawBack(true);
+        widgets.addSlot(inputs.get(0), 6, 35).drawBack(true);
+        widgets.addSlot(inputs.get(1), 38, 35).drawBack(true);
 
         widgets.addDrawable(93, 21, 32, 32, (draw, x, y, delta) ->
                 new EmiEntityDrawable(32, 32, outputs.get(0).getEmiStacks().get(0).getItemStack().getItem(), 21, true)
                         .render(draw, 6, 16, delta));
 
         widgets.addTexture(EmiTexture.LARGE_SLOT, 87, 16);
-        widgets.addSlot(outputs.get(0), 92, 21).recipeContext(this).drawBack(false);
+        widgets.addSlot(outputs.get(0), 91, 20).recipeContext(this).drawBack(false);
 
 
 
@@ -42,7 +42,7 @@ public class EmiHiveRecipe extends BasicEmiRecipe {
                         .render(draw, 6, 16, delta));
 
         widgets.addTexture(EmiTexture.LARGE_SLOT, 2, 2);
-        widgets.addSlot(inputs.get(2), 7, 7).recipeContext(this).drawBack(false);
+        widgets.addSlot(inputs.get(2), 6, 6).recipeContext(this).drawBack(false);
 
 
 
@@ -51,6 +51,6 @@ public class EmiHiveRecipe extends BasicEmiRecipe {
                         .render(draw, 6, 16, delta));
 
         widgets.addTexture(EmiTexture.LARGE_SLOT, 34, 2);
-        widgets.addSlot(inputs.get(3), 39, 7).recipeContext(this).drawBack(false);
+        widgets.addSlot(inputs.get(3), 38, 6).recipeContext(this).drawBack(false);
     }
 }

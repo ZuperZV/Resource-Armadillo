@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "resource_armadillo:chromium_ingot"
+  },
+  "ingredient_2": {
+    "item": "resource_armadillo:iron_scute"
+  },
+  "output": {
+    "item": "resource_armadillo:chromium_scute"
+  }
+}

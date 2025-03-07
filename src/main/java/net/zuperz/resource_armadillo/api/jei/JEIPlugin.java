@@ -17,11 +17,9 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
 import net.zuperz.resource_armadillo.block.ModBlocks;
 import net.zuperz.resource_armadillo.datagen.custom.BreedingRecipeBuilder;
-import net.zuperz.resource_armadillo.recipes.BreedingRecipe;
-import net.zuperz.resource_armadillo.recipes.CentrifugeRecipe;
-import net.zuperz.resource_armadillo.recipes.ModRecipes;
-import net.zuperz.resource_armadillo.recipes.RoostRecipe;
+import net.zuperz.resource_armadillo.recipes.*;
 import net.zuperz.resource_armadillo.screen.ArmadilloHiveScreen;
+import net.zuperz.resource_armadillo.screen.NestScreen;
 import net.zuperz.resource_armadillo.screen.RoostScreen;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,6 +38,9 @@ public class JEIPlugin implements IModPlugin {
     public static mezz.jei.api.recipe.RecipeType<BreedingRecipe> HIVE_TYPE =
             new mezz.jei.api.recipe.RecipeType<>(HiveRecipeCategory.UID, BreedingRecipe.class);
 
+    public static mezz.jei.api.recipe.RecipeType<NestRecipe> NEST_TYPE =
+            new mezz.jei.api.recipe.RecipeType<>(NestRecipeCategory.UID, NestRecipe.class);
+
     @Override
     public ResourceLocation getPluginUid() {
         return ResourceLocation.fromNamespaceAndPath(ResourceArmadillo.MOD_ID, "jei_plugin");
@@ -52,6 +53,7 @@ public class JEIPlugin implements IModPlugin {
         registration.addRecipeCategories(new CentrifugeRecipeCategory(jeiHelpers.getGuiHelper()));
         registration.addRecipeCategories(new RoostRecipeCategory(jeiHelpers.getGuiHelper()));
         registration.addRecipeCategories(new HiveRecipeCategory(jeiHelpers.getGuiHelper()));
+        registration.addRecipeCategories(new NestRecipeCategory(jeiHelpers.getGuiHelper()));
     }
 
 
@@ -71,6 +73,10 @@ public class JEIPlugin implements IModPlugin {
             var hive = world.getRecipeManager();
             registration.addRecipes(HiveRecipeCategory.RECIPE_TYPE,
                     getRecipe(hive, ModRecipes.BREEDING_ARMADILLO_RECIPE_TYPE.get()));
+
+            var nest = world.getRecipeManager();
+            registration.addRecipes(NestRecipeCategory.RECIPE_TYPE,
+                    getRecipe(nest, ModRecipes.NEST_RECIPE_TYPE.get()));
         }
     }
 
@@ -94,6 +100,9 @@ public class JEIPlugin implements IModPlugin {
         var hive = new ItemStack(ModBlocks.ARMADILLO_HIVE.get());
         registration.addRecipeCatalyst(hive, HiveRecipeCategory.RECIPE_TYPE);
 
+        var nest = new ItemStack(ModBlocks.NEST.get());
+        registration.addRecipeCatalyst(nest, NestRecipeCategory.RECIPE_TYPE);
+
     }
 
     @Override
@@ -102,6 +111,8 @@ public class JEIPlugin implements IModPlugin {
         registration.addRecipeClickArea(RoostScreen.class, 80, 37, 24, 17, JEIPlugin.ROOST_TYPE);
         registration.addRecipeClickArea(RoostScreen.class, 52, 39, 13, 11, RecipeTypes.FUELING);
 
-        registration.addRecipeClickArea(ArmadilloHiveScreen.class, 80, 37, 24, 17, JEIPlugin.ROOST_TYPE);
+        registration.addRecipeClickArea(ArmadilloHiveScreen.class, 80, 37, 24, 17, JEIPlugin.HIVE_TYPE);
+
+        registration.addRecipeClickArea(NestScreen.class, 78, 37, 24, 17, JEIPlugin.NEST_TYPE);
     }
 }

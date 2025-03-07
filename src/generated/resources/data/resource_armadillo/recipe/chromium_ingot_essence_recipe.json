@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "resource_armadillo:chromium_essence"
+    }
+  },
+  "pattern": [
+    "AAA",
+    " A ",
+    "AAA"
+  ],
+  "result": {
+    "count": 12,
+    "id": "resource_armadillo:chromium_ingot"
+  }
+}

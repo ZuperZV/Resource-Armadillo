@@ -1,10 +1,10 @@
 {
   "type": "resource_armadillo:roost",
   "ingredient_1": {
-    "item": "minecraft:iron_ore"
+    "item": "minecraft:iron_ingot"
   },
   "ingredient_2": {
-    "item": "resource_armadillo:cobblestone_scute"
+    "item": "resource_armadillo:coal_scute"
   },
   "output": {
     "item": "resource_armadillo:iron_scute"

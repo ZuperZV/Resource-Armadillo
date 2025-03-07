@@ -19,7 +19,7 @@ public class ScuteJsonLoader {
     private static final List<ArmadilloScuteType> LOADED_SCUTES = new ArrayList<>();
 
     public static void loadScutesFromJson() {
-        Path directory = FMLPaths.GAMEDIR.get().resolve("config/resource_armadillo/scutes/");
+        Path directory = FMLPaths.GAMEDIR.get().resolve("config/resource_armadillo/scute/");
 
         if (!Files.exists(directory)) {
             System.out.println("[ScuteJsonLoader] JSON-folder findes ikke: " + directory);

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "tag": "c:rods/wooden"
+    },
+    "B": {
+      "item": "minecraft:hay_block"
+    },
+    "C": {
+      "tag": "minecraft:logs"
+    },
+    "D": {
+      "tag": "c:gems"
+    }
+  },
+  "pattern": [
+    "A A",
+    "CBC",
+    "CDC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "resource_armadillo:armadillo_hive"
+  }
+}

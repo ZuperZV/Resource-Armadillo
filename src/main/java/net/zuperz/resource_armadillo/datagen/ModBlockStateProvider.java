@@ -18,8 +18,6 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-        blockWithItem(ModBlocks.ARMADILLO_HIVE);
-
         blockWithItem(ModBlocks.CHROMIUM_BLOCK);
         blockWithItem(ModBlocks.CHROMIUM_ORE);
         blockWithItem(ModBlocks.CHROMIUM_DEEPSLATE_ORE);

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_obsidian_armor": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:obsidian_scute"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_armadillo:obsidian_armor_crafted_from_obsidian_scute"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_obsidian_armor"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_armadillo:obsidian_armor_crafted_from_obsidian_scute"
+    ]
+  }
+}

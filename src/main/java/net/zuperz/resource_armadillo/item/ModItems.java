@@ -28,8 +28,20 @@ public class ModItems {
     public static final DeferredItem<Item> CHROMIUM_INGOT = ITEMS.registerItem("chromium_ingot",
             Item::new, (new Item.Properties()));
 
+    public static final DeferredItem<Item> GOLD_BRUSH = ITEMS.registerItem("gold_brush",
+            BrushItem::new, (new Item.Properties().durability(250)));
+
     public static final DeferredItem<Item> IRON_BRUSH = ITEMS.registerItem("iron_brush",
-            BrushItem::new, (new Item.Properties().durability(94)));
+            BrushItem::new, (new Item.Properties().durability(250)));
+
+    public static final DeferredItem<Item> CHROMIUM_BRUSH = ITEMS.registerItem("chromium_brush",
+            BrushItem::new, (new Item.Properties().durability(1050)));
+
+    public static final DeferredItem<Item> DIAMOND_BRUSH = ITEMS.registerItem("diamond_brush",
+            BrushItem::new, (new Item.Properties().durability(1561)));
+
+    public static final DeferredItem<Item> NETHERITE_BRUSH = ITEMS.registerItem("netherite_brush",
+            BrushItem::new, (new Item.Properties().durability(1561)));
 
     public static final DeferredItem<Item> ARMADILLO_PART = ITEMS.registerItem("armadillo_part",
             Item::new, (new Item.Properties().durability(94)));

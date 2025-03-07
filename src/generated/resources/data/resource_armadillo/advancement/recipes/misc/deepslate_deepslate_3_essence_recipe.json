@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_cobblestone_essence": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:cobblestone_essence"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_deepslate_essence": {
+      "conditions": {
+        "items": [
+          {
+            "items": "resource_armadillo:deepslate_essence"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "resource_armadillo:deepslate_deepslate_3_essence_recipe"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_deepslate_essence",
+      "has_cobblestone_essence"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "resource_armadillo:deepslate_deepslate_3_essence_recipe"
+    ]
+  }
+}

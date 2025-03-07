@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "resource_armadillo:slime_essence"
+    }
+  },
+  "pattern": [
+    " A ",
+    "AAA",
+    "AAA"
+  ],
+  "result": {
+    "count": 2,
+    "id": "minecraft:slime_block"
+  }
+}

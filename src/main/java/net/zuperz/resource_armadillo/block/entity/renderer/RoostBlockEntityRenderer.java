@@ -69,7 +69,7 @@ public class RoostBlockEntityRenderer implements BlockEntityRenderer<RoostBlockE
 
         poseStack.translate(position.x - pos.getX(), position.y - pos.getY(), position.z - pos.getZ());
 
-        poseStack.mulPose(Axis.YP.rotationDegrees(rot));
+        poseStack.mulPose(Axis.YN.rotationDegrees(rot));
 
         if (!blockEntity.isArmadilloBaby()) {
             poseStack.scale(1.0f, 1.0f, 1.0f);
@@ -78,12 +78,15 @@ public class RoostBlockEntityRenderer implements BlockEntityRenderer<RoostBlockE
         }
 
         Entity renderEntity = EntityType.ARMADILLO.create(level);
+
+
         if (renderEntity != null) {
             renderEntity.setPos(position.x, position.y, position.z);
             renderEntity.setNoGravity(true);
             renderEntity.setYHeadRot(0);
 
             entityRenderer.render(renderEntity, 0.0d, 0.0d, 0.0d, 0.0f, partialTick, poseStack, bufferSource, getLightLevel(level, pos));
+            entityRenderer.setRenderShadow(false);
         }
 
         poseStack.popPose();

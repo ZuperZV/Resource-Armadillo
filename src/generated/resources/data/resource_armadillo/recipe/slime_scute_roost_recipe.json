@@ -1,0 +1,12 @@
+{
+  "type": "resource_armadillo:roost",
+  "ingredient_1": {
+    "item": "minecraft:slime_ball"
+  },
+  "ingredient_2": {
+    "item": "resource_armadillo:sand_scute"
+  },
+  "output": {
+    "item": "resource_armadillo:slime_scute"
+  }
+}

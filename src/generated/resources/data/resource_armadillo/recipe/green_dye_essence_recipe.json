@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "resource_armadillo:dye_essence"
+    }
+  },
+  "pattern": [
+    "AA ",
+    " A ",
+    " A "
+  ],
+  "result": {
+    "count": 8,
+    "id": "minecraft:green_dye"
+  }
+}

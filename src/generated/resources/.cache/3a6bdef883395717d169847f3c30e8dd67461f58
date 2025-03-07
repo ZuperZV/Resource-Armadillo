@@ -1,3 +1,5 @@
-// 1.21	2025-02-10T21:51:16.0837028	Tags for minecraft:item mod id resource_armadillo
+// 1.21	2025-03-02T18:17:39.1167898	Tags for minecraft:item mod id resource_armadillo
 5b03855f78af6c21e9cf12fbc4346c1a0ae57d6c data/c/tags/item/ingots.json
 bb63c177bc103e4816fd93fa37ca49e0a5dbdf57 data/c/tags/item/raw_materials.json
+3ad4e0df3a948778f2f14b8f806c52a0889cfb6c data/c/tags/item/tools/brush.json
+3ad4e0df3a948778f2f14b8f806c52a0889cfb6c data/minecraft/tags/item/enchantable/durability.json

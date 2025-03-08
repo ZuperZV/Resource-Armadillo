@@ -649,7 +649,6 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
                 Vec3.atLowerCornerOf(pos.offset((int) radius, (int) radius, (int) radius))
         );
 
-        List<Player> players = level.getEntitiesOfClass(Player.class, searchArea);
         List<Armadillo> armadillos = level.getEntitiesOfClass(Armadillo.class, searchArea);
 
         if (isArmadilloDataEmpty()) {
@@ -661,7 +660,6 @@ public class RoostBlockEntity extends BlockEntity implements MenuProvider, World
 
                 blockEntity.setStoredArmadilloData(armadilloData.toString());
                 armadillo.discard();
-                level.playSound((Entity) players, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 2f);
 
                 lastArmadilloExitTime = System.currentTimeMillis();
 

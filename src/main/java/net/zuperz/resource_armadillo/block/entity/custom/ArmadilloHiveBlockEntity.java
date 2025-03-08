@@ -883,8 +883,6 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
         );
 
         List<Armadillo> armadillos = level.getEntitiesOfClass(Armadillo.class, searchArea);
-        List<Player> players = level.getEntitiesOfClass(Player.class, searchArea);
-
         List<ResourceArmadilloEntity> resourceArmadillos = level.getEntitiesOfClass(ResourceArmadilloEntity.class, searchArea);
 
         if (isArmadilloDataEmpty()) {
@@ -896,7 +894,6 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
 
                     blockEntity.setStoredArmadilloData(armadilloData.toString());
                     armadillo.discard();
-                    level.playSound((Entity) players, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 2f);
 
                     lastArmadilloExitTime = System.currentTimeMillis();
                     blockEntity.setChanged();
@@ -910,7 +907,6 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
 
                     blockEntity.setStoredArmadilloData(armadilloData.toString());
                     resourceArmadillo.discard();
-                    level.playSound((Entity) players, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 2f);
 
                     lastArmadilloExitTime = System.currentTimeMillis();
                     blockEntity.setChanged();
@@ -925,7 +921,6 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
 
                     blockEntity.setStoredArmadilloData2(armadilloData.toString());
                     armadillo.discard();
-                    level.playSound((Entity) players, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 2f);
 
                     lastArmadilloExitTime = System.currentTimeMillis();
                     blockEntity.setChanged();
@@ -939,7 +934,6 @@ public class ArmadilloHiveBlockEntity extends BlockEntity implements MenuProvide
 
                     blockEntity.setStoredArmadilloData2(armadilloData.toString());
                     resourceArmadillo.discard();
-                    level.playSound((Entity) players, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 2f);
 
                     lastArmadilloExitTime = System.currentTimeMillis();
                     blockEntity.setChanged();

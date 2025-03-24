@@ -1,0 +1,6 @@
+{
+  "type": "resource_armadillo:scute_type",
+  "name": "resource_armadillo:roost",
+  "entity_texture": "resource_armadillo:textures/entity/redstone_armadillo.png",
+  "wolf_texture": "resource_armadillo:textures/entity/wolf/redstone_armor.png"
+}

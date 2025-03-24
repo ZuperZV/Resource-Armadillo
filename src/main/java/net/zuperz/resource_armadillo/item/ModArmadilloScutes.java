@@ -1,9 +1,15 @@
 package net.zuperz.resource_armadillo.item;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.zuperz.resource_armadillo.ResourceArmadillo;
 import net.zuperz.resource_armadillo.item.custom.ArmadilloScuteItem;
+import net.zuperz.resource_armadillo.recipes.ModRecipes;
+import net.zuperz.resource_armadillo.recipes.ScuteTypeRecipe;
 import net.zuperz.resource_armadillo.util.ArmadilloScuteRegistry;
 import net.zuperz.resource_armadillo.util.ArmadilloScuteType;
 import net.zuperz.resource_armadillo.util.ScuteJsonLoader;
@@ -11,7 +17,7 @@ import net.neoforged.fml.ModList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SequencedCollection;
+import java.util.stream.Collectors;
 
 public class ModArmadilloScutes {
     private static final boolean DEBUG = !FMLEnvironment.production;
@@ -90,9 +96,5 @@ public class ModArmadilloScutes {
             registry.register(scute);
             SCUTE_TYPES.add(scute);
         });
-    }
-
-    public static SequencedCollection<ArmadilloScuteType> getModSucte() {
-        return MOD_SCUTE_TYPES;
     }
 }

@@ -76,14 +76,14 @@ public class ResourceArmadillo
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
 
+        ModRecipes.SERIALIZERS.register(modEventBus);
+        ModRecipes.RECIPE_TYPES.register(modEventBus);
+
         ModCreativeModeTabs.register(modEventBus);
         ModDataComponentTypes.register(modEventBus);
 
         ModMenuTypes.register(modEventBus);
         ModBlockEntities.register(modEventBus);
-
-        ModRecipes.SERIALIZERS.register(modEventBus);
-        ModRecipes.RECIPE_TYPES.register(modEventBus);
 
         ModEntities.register(modEventBus);
 

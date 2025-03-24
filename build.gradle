@@ -27,8 +27,6 @@ repositories {
             includeGroup "mezz.jei"
         }
     }
-    maven { url 'https://maven.blamejared.com' }
-
 
     maven {
         url "https://maven.terraformersmc.com"

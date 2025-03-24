@@ -23,6 +23,7 @@ public class ModRecipes {
         SERIALIZERS.register(eventBus);
     }
 
+    // Recipes
     public static final Supplier<RecipeType<RoostRecipe>> ROOST_RECIPE_TYPE =
             RECIPE_TYPES.register("roost", () -> RoostRecipe.Type.INSTANCE);
 
@@ -35,8 +36,10 @@ public class ModRecipes {
     public static final Supplier<RecipeType<NestRecipe>> NEST_RECIPE_TYPE =
             RECIPE_TYPES.register("nest", () -> NestRecipe.Type.INSTANCE);
 
+    public static final Supplier<RecipeType<ScuteTypeRecipe>> SCUTE_TYPE_RECIPE_TYPE =
+            RECIPE_TYPES.register("scute_type", () -> ScuteTypeRecipe.Type.INSTANCE);
 
-
+    // Serializers
     public static final Supplier<RecipeSerializer<RoostRecipe>> ATOMIC_OVEN_SERIALIZER =
             SERIALIZERS.register("roost", () -> RoostRecipe.Serializer.INSTANCE);
 
@@ -48,4 +51,7 @@ public class ModRecipes {
 
     public static final Supplier<RecipeSerializer<NestRecipe>> NEST_SERIALIZER =
             SERIALIZERS.register("nest", () -> NestRecipe.Serializer.INSTANCE);
+
+    public static final Supplier<RecipeSerializer<ScuteTypeRecipe>> SCUTE_TYPE_SERIALIZER =
+            SERIALIZERS.register("scute_type", () -> ScuteTypeRecipe.Serializer.INSTANCE);
 }

@@ -225,8 +225,9 @@ public class ResourceArmadilloEntity extends Animal {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MAX_HEALTH,
-                12.0).add(Attributes.MOVEMENT_SPEED, 0.14);
+        return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 12.0)
+                .add(Attributes.MOVEMENT_SPEED, 0.14);
     }
 
     @Override
@@ -542,7 +543,7 @@ public class ResourceArmadilloEntity extends Animal {
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         } else if (itemstack.is(Items.SHEARS) && this.shearOffScute()) {
             itemstack.hurtAndBreak(5, pPlayer, getSlotForHand(pHand));
-        } else if (itemstack.isEmpty() && !(itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH) && !(itemstack.is(Items.SHEARS)))) {
+        } else if (pPlayer.isCreative() && itemstack.isEmpty() && !(itemstack.canPerformAction(net.neoforged.neoforge.common.ItemAbilities.BRUSH_BRUSH) && !(itemstack.is(Items.SHEARS)))) {
             pPlayer.sendSystemMessage(Component.literal("resource is: " + getResource().getDisplayName().getString()));
             pPlayer.sendSystemMessage(Component.literal("scuteCount is: " + scuteCount));
             pPlayer.sendSystemMessage(Component.literal("scuteCountTime is: " + scuteCountTime));

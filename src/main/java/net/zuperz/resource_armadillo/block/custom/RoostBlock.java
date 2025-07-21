@@ -118,6 +118,7 @@ public class RoostBlock extends BasicArmadilloBlock  {
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+
         if (state.getValue(LIT)) {
             double d0 = (double)pos.getX() + 0.5;
             double d1 = (double)pos.getY();
@@ -146,8 +147,10 @@ public class RoostBlock extends BasicArmadilloBlock  {
             level.addParticle(ParticleTypes.SMOKE, d0 + d5, d1 + d6, d2 + d7, 0.0, 0.0, 0.0);
             level.addParticle(ParticleTypes.FLAME, d0 + d5, d1 + d6, d2 + d7, 0.0, 0.0, 0.0);
 
-            if(level.getBlockEntity(pos) instanceof RoostBlockEntity AtomicOvenBlockEntity && !AtomicOvenBlockEntity.getInputItems().getStackInSlot(1).isEmpty()) {
-                level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, AtomicOvenBlockEntity.getInputItems().getStackInSlot(1)),
+            if(level.getBlockEntity(pos) instanceof RoostBlockEntity RoostBlockEntity && !RoostBlockEntity.getInputItems().getStackInSlot(1).isEmpty() && !RoostBlockEntity.getInputItems().getStackInSlot(2).isEmpty() && RoostBlockEntity.getProgress() > 0) {
+                level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, RoostBlockEntity.getInputItems().getStackInSlot(1)),
+                        xPos + xOffsets, yPos + yOffset, zPos + zOffset, 0.002, 0.001, 0.002);
+                level.addParticle(new ItemParticleOption(ParticleTypes.ITEM, RoostBlockEntity.getInputItems().getStackInSlot(1)),
                         xPos + xOffsets, yPos + yOffset, zPos + zOffset, 0.002, 0.001, 0.002);
             }
         }

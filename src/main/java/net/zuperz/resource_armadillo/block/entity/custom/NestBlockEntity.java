@@ -83,9 +83,9 @@ public class NestBlockEntity extends BlockEntity implements MenuProvider, Worldl
     private final Lazy<IItemHandler> outputItemHandler = Lazy.of(() -> new CustomItemHandler(outputItems));
 
 
-    private static final int[] SLOTS_FOR_UP = new int[]{0, 1};
-    private static final int[] SLOTS_FOR_DOWN = new int[]{0, 1};
-    private static final int[] SLOTS_FOR_SIDES = new int[]{0, 1};
+    private static final int[] SLOTS_FOR_UP = new int[]{0};
+    private static final int[] SLOTS_FOR_DOWN = new int[]{5};
+    private static final int[] SLOTS_FOR_SIDES = new int[]{0};
 
     private int progress = 0;
     private int maxProgress = 600;
@@ -262,7 +262,6 @@ public class NestBlockEntity extends BlockEntity implements MenuProvider, Worldl
                         stack.setDamageValue(stack.getDamageValue() + 1);
                     }
 
-
                     if (enchantments != null && !enchantments.isEmpty()) {
                         stack.set(DataComponents.ENCHANTMENTS, enchantments);
                     }
@@ -436,6 +435,7 @@ public class NestBlockEntity extends BlockEntity implements MenuProvider, Worldl
         tag.putInt("maxProgress", this.maxProgress);
         tag.putString("storedArmadilloData", this.storedArmadilloData);
         tag.put("inputItems", inputItems.serializeNBT(registries));
+        tag.put("outputItems", outputItems.serializeNBT(registries));
     }
 
     @Override
@@ -445,6 +445,7 @@ public class NestBlockEntity extends BlockEntity implements MenuProvider, Worldl
         this.maxProgress = tag.getInt("maxProgress");
         this.storedArmadilloData = tag.getString("storedArmadilloData");
         inputItems.deserializeNBT(registries, tag.getCompound("inputItems"));
+        outputItems.deserializeNBT(registries, tag.getCompound("outputItems"));
     }
 
 
@@ -564,19 +565,27 @@ public class NestBlockEntity extends BlockEntity implements MenuProvider, Worldl
     }
 
     @Override
-    public ItemStack getItem(int pSlot) {
-        if (pSlot < 4) {
-            return inputItems.getStackInSlot(pSlot);
+    public ItemStack getItem(int slot) {
+        if (slot < inputItems.getSlots()) {
+            return inputItems.getStackInSlot(slot);
         }
-        return null;
+        else if (slot == inputItems.getSlots()) {
+            return outputItems.getStackInSlot(0);
+        }
+
+        return ItemStack.EMPTY;
     }
 
     @Override
     public void setItem(int slot, ItemStack stack) {
-        if (slot < 4) {
+        if (slot < inputItems.getSlots()) {
             inputItems.setStackInSlot(slot, stack);
+        } else if (slot == inputItems.getSlots()) {
+            outputItems.setStackInSlot(0, stack);
         }
+
         setChanged();
+
         if (!level.isClientSide) {
             markForUpdate();
         }
@@ -590,23 +599,27 @@ public class NestBlockEntity extends BlockEntity implements MenuProvider, Worldl
     }
 
     @Override
-    public ItemStack removeItem(int slotIndex, int count) {
-        int adjustedIndex = slotIndex - inputItems.getSlots();
+    public ItemStack removeItem(int slot, int count) {
+        if (slot < inputItems.getSlots()) {
+            return inputItems.extractItem(slot, count, false);
+        } else if (slot == inputItems.getSlots()) {
+            return outputItems.extractItem(0, count, false);
+        }
 
         return ItemStack.EMPTY;
     }
 
     @Override
-    public ItemStack removeItemNoUpdate(int slotIndex) {
-        if (slotIndex < inputItems.getSlots()) {
-            ItemStack stackInSlot = inputItems.getStackInSlot(slotIndex);
-
-            if (!stackInSlot.isEmpty()) {
-                inputItems.setStackInSlot(slotIndex, ItemStack.EMPTY);
-                return stackInSlot;
-            }
+    public ItemStack removeItemNoUpdate(int slot) {
+        if (slot < inputItems.getSlots()) {
+            ItemStack stack = inputItems.getStackInSlot(slot);
+            inputItems.setStackInSlot(slot, ItemStack.EMPTY);
+            return stack;
+        } else if (slot == inputItems.getSlots()) {
+            ItemStack stack = outputItems.getStackInSlot(0);
+            outputItems.setStackInSlot(0, ItemStack.EMPTY);
+            return stack;
         }
-        int adjustedIndex = slotIndex - inputItems.getSlots();
 
         return ItemStack.EMPTY;
     }
@@ -625,6 +638,7 @@ public class NestBlockEntity extends BlockEntity implements MenuProvider, Worldl
         for (int i = 0; i < inputItems.getSlots(); i++) {
             inputItems.setStackInSlot(i, ItemStack.EMPTY);
         }
+        outputItems.setStackInSlot(0, ItemStack.EMPTY);
     }
 
     public float getScaledProgress() {

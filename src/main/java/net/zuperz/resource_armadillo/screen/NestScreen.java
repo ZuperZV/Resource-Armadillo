@@ -166,6 +166,8 @@ public class NestScreen extends AbstractContainerScreen<NestMenu> {
 
         String armadilloType = menu.blockentity.isArmadilloBaby() ? "Baby Armadillo" : "Armadillo";
 
+        List<Component> pTooltipComponents;
+
         Component tooltipText = Component.literal(itemName + armadilloType);
         Component tooltipText2 = CommonComponents.EMPTY;
         Component tooltipText3 = Component.translatable("tool_tip.resource_armadillo.left_click")
